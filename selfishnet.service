@@ -1,0 +1,18 @@
+[Unit]
+Description=SelfishNet-Linux — controle de la bande passante du reseau partage
+Documentation=file:/usr/local/sbin/selfishnet
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/sbin/selfishnet daemon
+ExecStop=/usr/bin/python3 /usr/local/sbin/selfishnet clean
+Restart=on-failure
+RestartSec=3
+# Le service a besoin du réseau brut
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
+
+[Install]
+WantedBy=multi-user.target
