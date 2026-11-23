@@ -16,8 +16,18 @@ cd selfishnet-linux
 bash install.sh
 ```
 
-Le script installe `python3-scapy`, `iptables`, `iproute2`, active
-`net.ipv4.ip_forward`, et crée la commande `selfishnet`.
+### Prérequis Linux
+
+- Distribution Linux avec `apt`, `dnf` ou `pacman`
+- Python 3
+- Les droits administrateur (`sudo`)
+- Les outils réseau `iptables`, `ip`, `tcpdump` et `tc`
+- Tkinter pour l'interface graphique
+- Une connexion locale au réseau à contrôler
+
+Le script installe les dépendances disponibles avec votre gestionnaire de
+paquets, active `net.ipv4.ip_forward`, installe `python3-scapy`, crée la
+commande `selfishnet` et ajoute l'entrée graphique `selfishnet-gui`.
 
 Installation manuelle si vous préférez :
 
@@ -25,6 +35,50 @@ Installation manuelle si vous préférez :
 sudo apt install python3-scapy iptables iproute2 tcpdump
 sudo python3 selfishnet.py doctor     # vérifie que tout est prêt
 ```
+
+Après l'installation, lancez les commandes avec `sudo` :
+
+```bash
+sudo selfishnet doctor
+sudo selfishnet daemon
+sudo selfishnet-gui
+```
+
+Pour afficher l'aide complète :
+
+```bash
+selfishnet --help
+selfishnet-gui
+```
+
+### Windows
+
+Téléchargez `SelfishNet-Windows-<date>.zip` depuis les artefacts du workflow
+GitHub Actions **Build Windows release**, puis extrayez l'archive et lancez
+`SelfishNet-GUI.exe`.
+
+Windows 10/11 64 bits est requis pour l'exécutable fourni. Aucun Python,
+PowerShell ou Scapy n'est nécessaire sur la machine Windows après extraction.
+
+L'exécutable Windows est actuellement un paquetage de l'interface Tkinter.
+Le moteur réseau de ce projet dépend de Linux (`iptables`, `tc`, `/proc`,
+ARP via Scapy et `/run/selfishnet.sock`) : il ne peut pas contrôler un réseau
+Linux en étant lancé comme une application Windows native. Android n'est pas
+disponible dans cette release.
+
+Pour créer soi-même les releases :
+
+```bash
+# Linux
+bash build-release.sh
+```
+
+```powershell
+# Windows PowerShell
+.\build-windows.ps1
+```
+
+Ces scripts exécutent les tests puis créent les archives dans `dist/release`.
 
 ## 2. Utilisation
 
