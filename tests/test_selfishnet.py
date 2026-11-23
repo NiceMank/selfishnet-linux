@@ -5,6 +5,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 import selfishnet as sn
 
+from unittest.mock import patch
+import selfishnet_windows as snw
+
 
 def test_human_rate():
     assert sn.human_rate(None) == "illimité"
@@ -87,3 +90,26 @@ def test_save_and_load_state(tmp_path, monkeypatch):
     monkeypatch.setattr(sn, "STATE_FILE", str(state_file))
     sn.save_state({"192.168.1.2": {"mode": "pause"}})
     assert sn.load_state() == {"192.168.1.2": {"mode": "pause"}}
+
+
+def test_firewall_rule_name():
+    assert snw.firewall_rule_name("192.168.1.42", "In") == "SelfishNet-In-192_168_1_42"
+
+
+def test_pause_ip_creates_in_and_out_rules():
+    with patch("selfishnet_windows.run_netsh", return_value=(0, "ok")) as run:
+        assert snw.pause_ip("192.168.1.42")
+        assert run.call_count == 4
+        commands = [call.args for call in run.call_args_list]
+        assert any("dir=in" in command for command in commands)
+        assert any("dir=out" in command for command in commands)
+        assert all("remoteip=192.168.1.42" in command for command in commands[1::2])
+
+
+def test_pause_ip_rejects_invalid_address():
+    try:
+        snw.pause_ip("not-an-ip")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Une adresse invalide doit etre rejetee")

@@ -58,13 +58,22 @@ GitHub Actions **Build Windows release**, puis extrayez l'archive et lancez
 `SelfishNet-GUI.exe`.
 
 Windows 10/11 64 bits est requis pour l'exécutable fourni. Aucun Python,
-PowerShell ou Scapy n'est nécessaire sur la machine Windows après extraction.
+PowerShell ou Scapy n'est nécessaire après extraction, mais **Npcap** est
+obligatoire. Installez Npcap pour Windows depuis
+<https://npcap.com/#download> en activant les fonctionnalités de capture
+réseau compatibles WinPcap. Npcap est utilisé avec les droits administrateur
+pour l'écoute ARP/IP.
 
-L'exécutable Windows est actuellement un paquetage de l'interface Tkinter.
-Le moteur réseau de ce projet dépend de Linux (`iptables`, `tc`, `/proc`,
-ARP via Scapy et `/run/selfishnet.sock`) : il ne peut pas contrôler un réseau
-Linux en étant lancé comme une application Windows native. Android n'est pas
-disponible dans cette release.
+La release Windows inclut un moteur natif Windows distinct : découverte ARP,
+empoisonnement ARP temporaire pour la cible, blocage bidirectionnel via le
+Pare-feu Windows (`netsh`), restauration ARP et libération de toutes les règles
+créées par l'application. Lancez l'EXE en administrateur; le manifeste demande
+automatiquement l'élévation UAC.
+
+Cette release Windows prend actuellement en charge le mode **Pause/Libérer**.
+Le plafonnement de débit précis n'est pas disponible sur Windows via cette
+implémentation, contrairement au mode Linux basé sur `tc`/`iptables`. Android
+n'est pas disponible dans cette release.
 
 Pour créer soi-même les releases :
 
