@@ -72,8 +72,9 @@ def test_daemon_safe_add_rejects_injection(tmp_path):
 def test_bundled_oui_lookup():
     core._OUI_LOADED = False
     core._OUI_CACHE.clear()
-    assert "Freebox" in core.get_vendor("00:07:cb:11:22:33")
-    assert "Raspberry Pi" in core.get_vendor("b8:27:eb:aa:bb:cc")
+    assert "freebox" in core.get_vendor("00:07:cb:11:22:33").lower()
+    assert "raspberry pi" in core.get_vendor("b8:27:eb:aa:bb:cc").lower()
+    assert "(base 16)" not in core.get_vendor("00:07:cb:11:22:33").lower()
     assert core.get_vendor("?") == ""
 
     # Verify fallback to bundled assets/oui.txt works when Linux system OUI files are absent (Windows)
@@ -312,4 +313,4 @@ def test_windows_snapshot_numeric_ip_sort(tmp_path):
         net.devices[ip] = {"ip": ip, "mac": "00:07:cb:00:00:01", "last": now, "packets": 1, "bytes": 64}
     rows = net.snapshot()
     assert [r["ip"] for r in rows] == ["192.168.1.5", "192.168.1.1", "192.168.1.2", "192.168.1.10"]
-    assert "Freebox" in rows[0]["vendor"]
+    assert "freebox" in rows[0]["vendor"].lower()

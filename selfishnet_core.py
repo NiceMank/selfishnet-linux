@@ -197,8 +197,12 @@ def _load_oui_databases():
                         parts = line.split(maxsplit=1)
                         if len(parts) == 2 and len(parts[0]) == 6:
                             key = parts[0].upper()
-                            if key not in _OUI_CACHE:
-                                _OUI_CACHE[key] = parts[1].strip()
+                            vendor = parts[1].strip()
+                            for marker in ("(base 16)", "(hex)"):
+                                if vendor.lower().startswith(marker):
+                                    vendor = vendor[len(marker):].strip()
+                            if vendor and key not in _OUI_CACHE:
+                                _OUI_CACHE[key] = vendor
             except OSError:
                 continue
         _OUI_LOADED = True
