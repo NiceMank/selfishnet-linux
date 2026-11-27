@@ -1,0 +1,270 @@
+# Curated offline OUI database for SelfishNet (Linux & Windows)
+# Format: <6-HEX-PREFIX> <Vendor Name>
+000393 Apple
+000502 Apple
+000A95 Apple
+0016CB Apple
+0017F2 Apple
+001B63 Apple
+001EC2 Apple
+002312 Apple
+002500 Apple
+0026BB Apple
+040CCE Apple
+18E7F4 Apple
+28CFE9 Apple
+3C15C2 Apple
+542696 Apple
+600308 Apple
+685B35 Apple
+705681 Apple
+7C6D62 Apple
+8863DF Apple
+907240 Apple
+A45E60 Apple
+ACBC32 Apple
+B8E856 Apple
+C82A14 Apple
+D023DB Apple
+DC2B61 Apple
+E4CE8F Apple
+F0B479 Apple
+F4F15A Apple
+001247 Samsung
+001599 Samsung
+001A8A Samsung
+001EE1 Samsung
+002119 Samsung
+002454 Samsung
+002637 Samsung
+0808C2 Samsung
+1449E0 Samsung
+1C62B8 Samsung
+244B03 Samsung
+30CBA7 Samsung
+38AA3C Samsung
+444E1A Samsung
+50CCF8 Samsung
+5CE8EB Samsung
+6C2F2C Samsung
+78471D Samsung
+8425DB Samsung
+90187C Samsung
+A0821F Samsung
+B43A28 Samsung
+C45006 Samsung
+D022BE Samsung
+E432CB Samsung
+F025B7 Samsung
+F8042E Samsung
+009EC8 Xiaomi
+0C1DAF Xiaomi
+14F65A Xiaomi
+286C07 Xiaomi
+34CE00 Xiaomi
+50642B Xiaomi
+64B473 Xiaomi
+742344 Xiaomi
+7811DC Xiaomi
+8CBEBE Xiaomi
+98FAE3 Xiaomi
+AC233F Xiaomi
+B0E235 Xiaomi
+C46AB7 Xiaomi
+D4970B Xiaomi
+E446DA Xiaomi
+F0B429 Xiaomi
+F8A45F Xiaomi
+001882 Huawei
+00259E Huawei
+00464B Huawei
+04F938 Huawei
+104780 Huawei
+200BC7 Huawei
+286ED4 Huawei
+346BD3 Huawei
+4846FB Huawei
+5C4CA9 Huawei
+70723C Huawei
+80FB06 Huawei
+94DBDA Huawei
+AC853D Huawei
+C8D15E Huawei
+E0247F Huawei
+F4C714 Huawei
+000C43 TP-Link
+002719 TP-Link
+14CC20 TP-Link
+18D6C7 TP-Link
+30B5C2 TP-Link
+50C7BF TP-Link
+60E327 TP-Link
+74DA88 TP-Link
+90F652 TP-Link
+A42BB0 TP-Link
+B04E26 TP-Link
+C025E9 TP-Link
+D807B6 TP-Link
+E894F6 TP-Link
+F4F26D TP-Link
+001B21 Intel
+001CC0 Intel
+00215C Intel
+0024D7 Intel
+08D40C Intel
+183DAF Intel
+28B2BD Intel
+340286 Intel
+4851B7 Intel
+5C514F Intel
+6C8814 Intel
+7C7A91 Intel
+8C705A Intel
+9C4E36 Intel
+A4C494 Intel
+B4B676 Intel
+C85B76 Intel
+D43D7E Intel
+E4B318 Intel
+F81654 Intel
+00E04C Realtek
+525400 QEMU/KVM
+000C29 VMware
+005056 VMware
+080027 VirtualBox
+00155D Microsoft Hyper-V
+000D3A Microsoft
+281878 Microsoft
+501AC5 Microsoft
+7C1E52 Microsoft
+B4AE2B Microsoft
+00044B NVIDIA
+48B02D NVIDIA
+B827EB Raspberry Pi
+DC632E Raspberry Pi
+E45F01 Raspberry Pi
+28CDC1 Raspberry Pi
+D83ADD Raspberry Pi
+240AC4 Espressif (IoT)
+30AEA4 Espressif (IoT)
+5CCF7F Espressif (IoT)
+84F3EB Espressif (IoT)
+A4CF12 Espressif (IoT)
+BCFF4D Espressif (IoT)
+CC50E3 Espressif (IoT)
+ECFAB7 Espressif (IoT)
+00041F Sony
+0013A9 Sony
+001D0D Sony
+0024BE Sony
+280DFC Sony
+709E29 Sony
+AC9B0A Sony
+FC0FE6 Sony
+0019FD Nintendo
+0022AA Nintendo
+34AF2C Nintendo
+58BDA3 Nintendo
+7CBB8A Nintendo
+98B6E9 Nintendo
+B8AE6E Nintendo
+E0E751 Nintendo
+001A11 Google
+3C5AB4 Google
+546009 Google
+94EB2C Google
+A47733 Google
+D86C63 Google
+F4F5D8 Google
+00FC8B Amazon
+0C47C9 Amazon
+44650D Amazon
+6837E9 Amazon
+74C246 Amazon
+A002DC Amazon
+F0D2F1 Amazon
+001E75 LG
+10683F LG
+344DF7 LG
+58A2B5 LG
+785DC8 LG
+A823FE LG
+C49A02 LG
+C0EEFB OnePlus
+94652D OnePlus
+AC3743 HTC
+000E6D Murata
+0026E8 Murata
+0014BF Cisco-Linksys
+0018F8 Cisco-Linksys
+001E58 D-Link
+1C7EE5 D-Link
+9094E4 D-Link
+001F33 Netgear
+204E7F Netgear
+4494FC Netgear
+841B5E Netgear
+A021B7 Netgear
+C43DC7 Netgear
+000C6E Asus
+049226 Asus
+1C872C Asus
+2C56DC Asus
+38D547 Asus
+50465D Asus
+6045CB Asus
+74D02B Asus
+9C5C8E Asus
+AC220B Asus
+B06EBF Asus
+D850E6 Asus
+F46D04 Asus
+0007CB Freebox
+140C76 Freebox
+249504 Freebox
+342792 Freebox
+68A378 Freebox
+70FC8F Freebox
+8C97EA Freebox
+E49E12 Freebox
+F4CAF1 Freebox
+001970 Sagemcom (Box)
+18622C Sagemcom (Box)
+348AA7 Sagemcom (Box)
+5C338E Sagemcom (Box)
+7C034C Sagemcom (Box)
+904CE5 Sagemcom (Box)
+A01B29 Sagemcom (Box)
+C0D044 Sagemcom (Box)
+E0A1D7 Sagemcom (Box)
+001E2A Technicolor (Box)
+101331 Technicolor (Box)
+30918F Technicolor (Box)
+589835 Technicolor (Box)
+88F7C7 Technicolor (Box)
+C4EA1D Technicolor (Box)
+001422 Dell
+001E4F Dell
+180373 Dell
+3417EB Dell
+549F35 Dell
+782BCB Dell
+B8AC6F Dell
+D4BED9 Dell
+F8BC12 Dell
+0017A4 HP
+00215A HP
+1C98EC HP
+3C5282 HP
+645106 HP
+9C8E99 HP
+D89EF3 HP
+0016D3 Lenovo
+0021CC Lenovo
+28D244 Lenovo
+54EE75 Lenovo
+8C1645 Lenovo
+C85B76 Lenovo
+001018 Broadcom
+000AF5 Qualcomm
+000CE7 MediaTek

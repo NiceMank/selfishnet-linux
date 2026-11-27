@@ -3,10 +3,12 @@
 # Usage : bash install.sh
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIB_DIR="/usr/local/lib/selfishnet"
+TARGET_USER="${SUDO_USER:-$USER}"
 
 echo "==> 1/5 Vérification des dépendances système"
 NEED_DEPS=0
-for bin in python3 iptables ip tcpdump; do
+for bin in python3 iptables ip tcpdump tc; do
   if ! command -v "$bin" >/dev/null 2>&1; then
     NEED_DEPS=1
     break
@@ -33,18 +35,31 @@ if [ "$NEED_DEPS" -eq 1 ]; then
       || pip install --user -r "$HERE/requirements.txt"
   fi
 else
-  echo "    Toutes les dépendances (Python, Scapy, Tkinter, iptables, tcpdump) sont déjà prêtes."
-  echo "    -> Aucun téléchargement requis."
+  echo "    Toutes les dépendances (Python, Scapy, Tkinter, iptables, tc, tcpdump) sont déjà prêtes."
   echo "==> 2/5 Dépendances Python prêtes"
 fi
 
-echo "==> 3/5 Activation du forwarding IP (nécessaire au mode « limite »)"
+echo "==> 3/5 Groupe système 'selfishnet' et forwarding IP"
+if ! getent group selfishnet >/dev/null 2>&1; then
+  sudo groupadd -r selfishnet
+fi
+if [ -n "$TARGET_USER" ] && [ "$TARGET_USER" != "root" ]; then
+  sudo usermod -aG selfishnet "$TARGET_USER" 2>/dev/null || true
+fi
 sudo sysctl -w net.ipv4.ip_forward=1 >/dev/null
 echo 'net.ipv4.ip_forward=1' | sudo tee /etc/sysctl.d/99-selfishnet.conf >/dev/null
 
-echo "==> 4/5 Commande 'selfishnet', raccourci d'application et service systemd"
-sudo install -m 0755 "$HERE/selfishnet.py" /usr/local/bin/selfishnet
-sudo install -m 0755 "$HERE/selfishnet_tui.py" /usr/local/bin/selfishnet-gui
+echo "==> 4/5 Installation des modules, commandes, raccourci et service systemd"
+sudo mkdir -p "$LIB_DIR/assets"
+sudo install -m 0644 "$HERE/selfishnet_core.py" "$LIB_DIR/selfishnet_core.py"
+sudo install -m 0755 "$HERE/selfishnet.py" "$LIB_DIR/selfishnet.py"
+sudo install -m 0755 "$HERE/selfishnet_tui.py" "$LIB_DIR/selfishnet_tui.py"
+[ -f "$HERE/assets/oui.txt" ] && sudo install -m 0644 "$HERE/assets/oui.txt" "$LIB_DIR/assets/oui.txt"
+[ -f "$HERE/assets/selfishnet.png" ] && sudo install -m 0644 "$HERE/assets/selfishnet.png" "$LIB_DIR/assets/selfishnet.png"
+[ -f "$HERE/assets/selfishnet.svg" ] && sudo install -m 0644 "$HERE/assets/selfishnet.svg" "$LIB_DIR/assets/selfishnet.svg"
+
+sudo ln -sf "$LIB_DIR/selfishnet.py" /usr/local/bin/selfishnet
+sudo ln -sf "$LIB_DIR/selfishnet_tui.py" /usr/local/bin/selfishnet-gui
 sudo ln -sf /usr/local/bin/selfishnet /usr/local/sbin/selfishnet
 sudo ln -sf /usr/local/bin/selfishnet-gui /usr/local/sbin/selfishnet-gui
 
@@ -55,7 +70,7 @@ sudo mkdir -p /usr/share/icons/hicolor/scalable/apps /usr/share/icons/hicolor/25
 [ -f "$HERE/selfishnet.desktop" ] && sudo cp "$HERE/selfishnet.desktop" /usr/share/applications/selfishnet.desktop
 command -v update-desktop-database >/dev/null && sudo update-desktop-database /usr/share/applications 2>/dev/null || true
 
-# Copie dans l'espace utilisateur local pour prise en compte immédiate sans sudo
+# Copie dans l'espace utilisateur local pour prise en compte immédiate
 mkdir -p "$HOME/.local/share/applications" "$HOME/.local/share/icons/hicolor/256x256/apps" "$HOME/.local/share/icons/hicolor/scalable/apps"
 cp "$HERE/selfishnet.desktop" "$HOME/.local/share/applications/" 2>/dev/null || true
 [ -f "$HERE/assets/selfishnet.png" ] && cp "$HERE/assets/selfishnet.png" "$HOME/.local/share/icons/hicolor/256x256/apps/" 2>/dev/null || true
@@ -71,20 +86,23 @@ fi
 
 echo "==> 5/5 Vérification"
 chmod +x "$HERE/selfishnet.py" "$HERE/selfishnet_tui.py"
-/usr/local/bin/selfishnet doctor
+sudo /usr/local/bin/selfishnet doctor
 
 cat <<'EOF'
 
 ✅ Installation terminée.
 
+Note : votre utilisateur a été ajouté au groupe 'selfishnet' pour contrôler le
+démon depuis la GUI sans sudo (reconnectez votre session ou exécutez `newgrp selfishnet`).
+
 Démarrage rapide :
     sudo selfishnet scan          # voir les appareils du wifi
     sudo selfishnet watch         # console interactive (recommandé)
-    sudo selfishnet-gui           # interface graphique
+    selfishnet-gui                # interface graphique (sans sudo)
 
 Ou en service permanent (démarre au boot) :
     sudo systemctl enable --now selfishnet
 
 Tout est réversible :  sudo selfishnet clean
-Désinstallation :      sudo bash uninstall.sh
+Désinstallation :      bash uninstall.sh
 EOF

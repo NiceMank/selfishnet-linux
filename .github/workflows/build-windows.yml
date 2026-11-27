@@ -2,6 +2,9 @@ name: Build Windows release
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - "v*"
 
 jobs:
   windows:
@@ -20,27 +23,33 @@ jobs:
           python -m pip install -r requirements.txt pytest pyinstaller
 
       - name: Run tests
-        run: python -m pytest -q
+        run: python -m pytest -v
 
       - name: Build Windows executable
         shell: pwsh
         run: |
-          python -m compileall selfishnet.py selfishnet_tui.py
+          python -m compileall selfishnet_core.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
+          $iconArgs = @()
+          if (Test-Path "assets/selfishnet.ico") {
+            $iconArgs = @("--icon", "assets/selfishnet.ico")
+          }
           pyinstaller --clean --noconfirm `
             --name SelfishNet-GUI `
             --onefile --windowed `
             --uac-admin `
-            --hidden-import scapy `
+            @iconArgs `
+            --collect-submodules scapy `
             --add-data "assets;assets" `
             selfishnet_windows_tui.py
           New-Item -ItemType Directory -Force -Path dist/release | Out-Null
           $date = Get-Date -Format "yyyyMMdd"
-          Compress-Archive -Force `
-            -Path dist/SelfishNet-GUI.exe `
-            -DestinationPath "dist/release/SelfishNet-Windows-$date.zip"
+          $zipPath = "dist/release/SelfishNet-Windows-$date.zip"
+          Compress-Archive -Force -Path dist/SelfishNet-GUI.exe -DestinationPath $zipPath
+          $hash = (Get-FileHash -Algorithm SHA256 $zipPath).Hash.ToLower()
+          "$hash  $(Split-Path -Leaf $zipPath)" | Out-File -Encoding ascii "dist/release/SHA256SUMS.txt"
 
       - name: Upload Windows release
         uses: actions/upload-artifact@v4
         with:
           name: selfishnet-windows-release
-          path: dist/release/*.zip
+          path: dist/release/*

@@ -4,13 +4,17 @@ set -uo pipefail
 
 echo "==> Arrêt du service et nettoyage des règles"
 sudo systemctl disable --now selfishnet 2>/dev/null || true
-sudo pkill -f "selfishnet.py" 2>/dev/null || true
+sudo pkill -TERM -f "selfishnet(\.py)? (daemon|watch)" 2>/dev/null || true
 sleep 1
-sudo python3 /usr/local/sbin/selfishnet clean 2>/dev/null || true
+if [ -x /usr/local/bin/selfishnet ]; then
+  sudo /usr/local/bin/selfishnet clean 2>/dev/null || true
+fi
 
 echo "==> Suppression des fichiers"
 sudo rm -f /usr/local/sbin/selfishnet /usr/local/sbin/selfishnet-gui
 sudo rm -f /usr/local/bin/selfishnet /usr/local/bin/selfishnet-gui
+sudo rm -rf /usr/local/lib/selfishnet
+sudo rm -f /run/selfishnet.sock
 sudo rm -f /usr/share/applications/selfishnet.desktop
 rm -f "$HOME/.local/share/applications/selfishnet.desktop" 2>/dev/null || true
 sudo rm -f /usr/share/icons/hicolor/scalable/apps/selfishnet.svg /usr/share/icons/hicolor/256x256/apps/selfishnet.png

@@ -1,15 +1,15 @@
-# SelfishNet-Linux — l'équivalent Linux de SelfishNet
+# SelfishNet — Contrôleur de bande passante Wi-Fi / LAN (Linux, Windows & Android Companion)
 
-Quand les autres appareils du wifi saturent la connexion et que vos agents IA
-(ou vos uploads, vos visios, vos git push) rament, cet outil vous redonne la
-priorité : il **met en pause** ou **plafonne le débit** des appareils de votre
-choix, exactement comme SelfishNet sous Windows.
+Quand les autres appareils du réseau saturent la connexion et que vos appels,
+uploads ou agents IA ralentissent, SelfishNet vous redonne la priorité : il
+**met en pause** ou **plafonne le débit** des appareils de votre choix, de façon
+entièrement réversible.
 
 ![Interface](gui_screenshot.png)
 
 ---
 
-## 1. Installation (2 minutes)
+## 1. Installation Linux
 
 ```bash
 cd selfishnet-linux
@@ -19,96 +19,96 @@ bash install.sh
 ### Prérequis Linux
 
 - Distribution Linux avec `apt`, `dnf` ou `pacman`
-- Python 3
-- Les droits administrateur (`sudo`)
-- Les outils réseau `iptables`, `ip`, `tcpdump` et `tc`
-- Tkinter pour l'interface graphique
-- Une connexion locale au réseau à contrôler
+- Python 3.10+
+- Droits administrateur (`sudo`) pour le démon réseau
+- Outils système : `iptables`, `ip`, `tc`, `tcpdump`
+- Tkinter pour l'interface graphique (`python3-tk`)
 
-Le script installe les dépendances disponibles avec votre gestionnaire de
-paquets, active `net.ipv4.ip_forward`, installe `python3-scapy`, crée la
-commande `selfishnet` et ajoute l'entrée graphique `selfishnet-gui`.
+Le script installe les dépendances, crée le groupe système `selfishnet` (pour
+permettre à votre utilisateur de piloter le démon depuis la GUI **sans `sudo`**),
+copie les modules dans `/usr/local/lib/selfishnet`, installe les commandes
+`selfishnet` et `selfishnet-gui`, et configure le service `systemd`.
 
-Installation manuelle si vous préférez :
+> Après l'installation, reconnectez votre session (ou exécutez `newgrp selfishnet`)
+> pour que l'accès au socket `/run/selfishnet.sock` soit actif sans `sudo`.
+
+Installation manuelle :
 
 ```bash
-sudo apt install python3-scapy iptables iproute2 tcpdump
-sudo python3 selfishnet.py doctor     # vérifie que tout est prêt
+sudo apt install python3-scapy python3-tk iptables iproute2 tcpdump
+sudo python3 selfishnet.py doctor
 ```
 
-Après l'installation, lancez les commandes avec `sudo` :
+Démarrage :
 
 ```bash
-sudo selfishnet doctor
-sudo selfishnet daemon
-sudo selfishnet-gui
+sudo selfishnet doctor            # vérifie la machine (inclut diagnostic IPv6)
+sudo selfishnet daemon            # ou : sudo systemctl enable --now selfishnet
+selfishnet-gui                    # interface graphique (sans sudo !)
 ```
 
-Pour afficher l'aide complète :
+---
+
+## 2. Version Windows (v1.1)
+
+Téléchargez `SelfishNet-Windows-<date>.zip` depuis les artefacts GitHub Actions
+(**Build Windows release**), extrayez-le puis lancez `SelfishNet-GUI.exe` (l'élévation
+UAC Administrateur est demandée automatiquement).
+
+### Prérequis Windows
+
+- Windows 10 / 11 64 bits
+- **Npcap** (<https://npcap.com/#download>) installé avec le mode compatible WinPcap
+
+### Fonctionnalités Windows incluses
+
+- Découverte passive + **balayage ARP actif (`F5`)** filtré strictement sur le sous-réseau local
+- Mesure temps réel du débit (**↑ montant / ↓ descendant**) et identification fabricant OUI hors-ligne
+- **Pause** (empoisonnement ARP + Pare-feu Windows multi-langues) et **Limite en kb/s** (relais L2 Npcap + Token Bucket)
+- **Safe Mode persistant** (PC local et passerelle protégés en permanence), **alias personnalisés** et **minuteur automatique**
+- Nettoyage garanti des règles (via PowerShell, indépendant de la langue Windows) et restauration ARP à la fermeture
+
+### Construire les releases soi-même
 
 ```bash
-selfishnet --help
-selfishnet-gui
-```
-
-### Windows
-
-Téléchargez `SelfishNet-Windows-<date>.zip` depuis les artefacts du workflow
-GitHub Actions **Build Windows release**, puis extrayez l'archive et lancez
-`SelfishNet-GUI.exe`.
-
-Windows 10/11 64 bits est requis pour l'exécutable fourni. Aucun Python,
-PowerShell ou Scapy n'est nécessaire après extraction, mais **Npcap** est
-obligatoire. Installez Npcap pour Windows depuis
-<https://npcap.com/#download> en activant les fonctionnalités de capture
-réseau compatibles WinPcap. Npcap est utilisé avec les droits administrateur
-pour l'écoute ARP/IP.
-
-La release Windows inclut un moteur natif Windows distinct : découverte ARP,
-empoisonnement ARP temporaire pour la cible, blocage bidirectionnel via le
-Pare-feu Windows (`netsh`), restauration ARP et libération de toutes les règles
-créées par l'application. Lancez l'EXE en administrateur; le manifeste demande
-automatiquement l'élévation UAC.
-
-Cette release Windows prend actuellement en charge le mode **Pause/Libérer**.
-Le plafonnement de débit précis n'est pas disponible sur Windows via cette
-implémentation, contrairement au mode Linux basé sur `tc`/`iptables`. Android
-n'est pas disponible dans cette release.
-
-Pour créer soi-même les releases :
-
-```bash
-# Linux
+# Linux (démon + GUI + SHA256SUMS)
 bash build-release.sh
 ```
 
 ```powershell
-# Windows PowerShell
+# Windows PowerShell (EXE avec icône + SHA256SUMS)
 .\build-windows.ps1
 ```
 
-Ces scripts exécutent les tests puis créent les archives dans `dist/release`.
+---
 
-## 2. Utilisation
+## 3. Préparation Android (Companion + Root/Hotspot)
 
-### a) Version graphique (comme SelfishNet Windows)
+Le démon intègre désormais une **API REST authentifiée (Bearer token)** prête pour
+une application compagnon Android sans root :
 
 ```bash
-sudo selfishnet-gui
+sudo selfishnet daemon --api-bind 0.0.0.0 --api-port 8443
 ```
-Boutons de sélection rapide :
 
-| Bouton | Effet |
-|---|---|
-| **Tout cocher** (ou `Ctrl+A`) | coche **tous** les appareils listés → puis « Mettre en pause » / « Limiter » |
-| **Tout décocher** (ou `Ctrl+D`) | vide la sélection |
-| **■ BLOQUER TOUT** | coupe **immédiatement tout le monde** sauf vous et la box (avec confirmation) |
-| **Limiter tout** / **Libérer tout** | plafonne ou rétablit tous les appareils d'un clic |
+Le démon affiche une URI `selfishnet://pair?...` prête pour l'appairage par QR Code.
+Consultez [docs/ANDROID_ARCHITECTURE.md](docs/ANDROID_ARCHITECTURE.md) pour le contrat API complet et l'architecture Android (Companion sans root, mode Root/Hotspot natif et connecteurs box).
 
-`Ctrl+clic` / `Maj+clic` pour une sélection multiple fine, puis : **Mettre en pause**,
-**Limiter** (débit en kb/s), ou **Libérer**.
+---
 
-### b) Console interactive (la plus fiable, marche en SSH)
+## 4. Utilisation
+
+### a) Interface graphique (Linux & Windows)
+
+```bash
+selfishnet-gui          # Linux (utilisateur normal)
+```
+
+- **Sélection rapide** : `Tout sélectionner` (`Ctrl+A`), `Tout désélectionner` (`Ctrl+D`), `Ctrl+clic`, `F5` (balayage ARP actif)
+- **Actions** : `Mettre en pause`, `Limiter` (en kb/s), `Durée` (minuteur auto en minutes, `0 = ∞`), `Libérer`, `Bloquer tout`, `Limiter tout`, `Libérer tout`
+- **Safe Mode & Alias** : `Protéger (Safe Mode)`, `Retirer protection`, `Renommer`
+
+### b) Console interactive (Linux / SSH)
 
 ```bash
 sudo selfishnet watch
@@ -116,120 +116,69 @@ sudo selfishnet watch
 
 | Touche | Effet |
 |---|---|
-| `1`, `2`, … | pause / reprendre l'appareil n° X |
-| `l` | limiter **tout le monde** (500 kb/s par défaut) |
-| `p` | mettre tout le monde en pause |
+| `1`, `2`, …, `12` | pause / reprendre l'appareil n° X |
+| `l` | limiter **tous les appareils non protégés** (500 kb/s par défaut) |
+| `p` | mettre **tous les appareils non protégés** en pause |
 | `f` | tout libérer |
-| `p` | **bloquer tout** (sauf vous et la box) |
+| `r` | lancer un balayage ARP actif du réseau |
 | `q` | quitter **et restaurer le réseau** |
 
-### c) En ligne de commande (scriptable, cron, alias)
+### c) Ligne de commande (scriptable)
 
 ```bash
-sudo selfishnet scan                 # découvrir les appareils
-sudo selfishnet pause 3              # coupe l'appareil n°3
-sudo selfishnet pause 2,4            # plusieurs d'un coup
-sudo selfishnet pause local          # bloque TOUT le monde sauf moi + la box
-sudo selfishnet pause all            # tout, sans exception
-sudo selfishnet limit 3 --rate 200   # 200 kb/s maxi
-sudo selfishnet free 3               # rend l'appareil à la normale
-sudo selfishnet free all             # tout le monde
-sudo selfishnet status               # état courant
-sudo selfishnet quit                 # arrête le service + restaure
+sudo selfishnet scan                       # découvrir les appareils (--json dispo)
+sudo selfishnet pause 3                    # coupe l'appareil n°3
+sudo selfishnet pause 3 --duration 600     # pause automatique de 10 minutes
+sudo selfishnet pause 2,4                  # plusieurs appareils d'un coup
+sudo selfishnet pause local                # coupe tous les appareils non protégés
+sudo selfishnet limit 3 --rate 200         # 200 kb/s maxi
+sudo selfishnet free 3                     # rend l'appareil à la normale
+sudo selfishnet free all                   # tout le monde
+sudo selfishnet safe add 192.168.1.25      # protège un appareil en Safe Mode
+sudo selfishnet alias set 192.168.1.25 "TV Salon"
+sudo selfishnet status --json              # état courant au format JSON
+sudo selfishnet quit                       # arrête le service + restaure tout
 ```
 
-Les commandes `pause/limit/free/status` ont besoin que le service tourne.
-Lancez-le une fois dans un terminal dédié :
+---
 
-```bash
-sudo selfishnet daemon          # ou en service permanent :
-sudo systemctl enable --now selfishnet
-```
+## 5. Sécurité, réversibilité & limites honnêtes
 
-…puis utilisez les commandes courtes depuis n'importe quel autre terminal.
+- **Sécurité IPC** : le socket `/run/selfishnet.sock` est restreint au groupe `selfishnet` (`0660`), toutes les commandes système sont exécutées sans shell (`shell=False`) avec validation stricte IPv4/MAC/interface.
+- **Sortie propre** : à `q`, `Ctrl-C`, `quit` ou `systemctl stop`, les tables ARP sont restaurées, les règles `iptables`/`ip6tables`/`tc` sont supprimées et `net.ipv4.ip_forward` est restauré à son état initial. Filet de sécurité : `sudo selfishnet clean`.
+- **IPv6** : `sudo selfishnet doctor` signale si IPv6 est actif sur le Wi-Fi (sur une box client classique, IPv6 peut contourner un blocage IPv4 seul).
+- **AP Isolation** : si la box active l'isolation des clients Wi-Fi, l'ARP spoofing ne peut pas intercepter le trafic ; vérifiez avec `sudo selfishnet selftest <IP>`.
 
-## 3. Les trois modes
+---
 
-| Mode | Effet réel | Usage |
-|---|---|---|
-| **pause** | L'appareil est totalement coupé (ARP spoofing + `DROP` par IP **et** par MAC quand le noyau le permet) | « coupe-le 10 minutes, je bosse » |
-| **limit** | Débit plafonné en kb/s, montant **et** descendant | l'appareil croit avoir du réseau mais ne peut plus saturer la ligne |
-| **free** | Retour à la normale (ARP restauré, règles supprimées) | dès que vous avez fini |
-
-## 4. Comment ça marche (et pourquoi c'est réversible)
-
-1. **Découverte** : écoute passive du réseau (ARP + IP) → liste des IP, MAC,
-   débit et nombre de paquets de chaque appareil. Aucun scan agressif.
-2. **ARP spoofing** : pour la cible choisie, votre machine se présente comme la
-   passerelle (et inversement), ce qui force son trafic à passer par vous.
-   `net.ipv4.ip_forward=1` étant activé, le trafic des appareils **non** ciblés
-   continue de circuler normalement.
-3. **Application** :
-   * pause → règles `iptables` `DROP` sur l'IP **et** sur la MAC source
-     (`-m mac --mac-source`) : changer d'adresse IP ne suffit donc pas à
-     contourner le blocage. Si le noyau n'a pas le module `mac`
-     (certains VPS/containers), repli automatique sur le blocage par IP seul
-     et l'interface l'indique ;
-   * limit → `tc` (HTB descendant + police ingress montant) si le noyau le
-     permet, sinon repli automatique sur `iptables -m limit` (*mode
-     compatibilité*, débit approximatif) ;
-4. **Sortie propre** : à `q`, `Ctrl‑C`, `quit` ou `systemctl stop`, les tables
-   ARP des cibles sont restaurées (5 ARP correctifs), les chaînes
-   `SELFISHNET` sont supprimées et le `qdisc` racine est retiré.
-   Filet de sécurité : `sudo selfishnet clean`.
-
-### Limites honnêtes
-
-* **Isolation des clients (AP isolation)** : si votre box l'active, les
-  appareils ne peuvent pas se parler → l'ARP spoofing ne fonctionne pas.
-  Testez : `sudo selfishnet selftest <IP d'un appareil>` (affiche le % de
-  pertes avant/après).
-* En **wifi**, votre carte et la box peuvent envoyer des trames plus vite que
-  le débit réel : « pause » est fiable, « limit » est précis en filaire et
-  approximatif en wifi (le mode compatibilité compte les paquets).
-* Ce n'est pas un contournement de la box : si l'appareil visé crypte/épingle
-  la MAC de la passerelle, ou si le réseau est en WPA3-Enterprise/802.1X avec
-  filtrage MAC, il faudra passer par l'interface d'administration du routeur.
-* Tout appareil **câblé** sur le même switch est aussi visible et gérable.
-
-## 5. Le cas « j'ai mon propre routeur / hotspot »
-
-C'est la configuration idéale (aucune limite AP isolation) : vous êtes le
-routeur, l'outil fonctionne à 100 %.
-
-```bash
-# sur la machine qui partage la connexion
-sudo selfishnet --iface wlan0 watch      # ou ap0 / br0 selon votre config
-```
-
-Pour un partage de connexion **depuis votre téléphone** (hotspot), lancez
-l'outil sur le PC connecté au hotspot : le téléphone n'est alors pas gérable
-(c'est lui le routeur), mais tous les autres clients du hotspot le sont.
-
-## 6. Désinstallation
+## 6. Désinstallation Linux
 
 ```bash
 bash uninstall.sh
-# ou, à la main :
-sudo selfishnet clean && sudo rm /usr/local/sbin/selfishnet*
 ```
 
-## 7. Avertissement
+---
 
-Cet outil modifie le réseau local. Ne l'utilisez que sur **votre** réseau et sur
-des appareils dont vous êtes responsable (votre box, votre partage de
-connexion, votre famille). Couper l'accès d'un tiers (cybercafé, wifi public,
-voisin) peut être illégal selon la législation locale et vous exposer à des
-poursuites. Si le problème vient d'un voisin qui vole votre wifi : changez le
-mot de passe, cachez le SSID, activez le filtrage MAC ou baissez la puissance
-d'émission de la box — c'est plus simple et plus sûr.
+## 7. Avertissement légal
 
-## 8. Fichiers
+Cet outil modifie le trafic du réseau local. Ne l'utilisez que sur **votre propre réseau**
+et sur des appareils dont vous êtes responsable (votre box, votre partage de connexion,
+votre domicile).
+
+---
+
+## 8. Architecture des fichiers
 
 | Fichier | Rôle |
 |---|---|
-| `selfishnet.py` | moteur + CLI + console interactive |
-| `selfishnet_tui.py` | interface graphique Tkinter |
-| `install.sh` / `uninstall.sh` | installation / retrait |
-| `selfishnet.service` | unité systemd (démarrage au boot) |
-| `requirements.txt` | scapy |
+| `selfishnet_core.py` | Noyau partagé (validation stricte, OUI, alias, minuteurs, TokenBucket, IPC, API Companion Android) |
+| `selfishnet.py` | Moteur Linux (ARP, iptables/ip6tables, tc HTB/ingress), démon IPC, CLI & TUI |
+| `selfishnet_tui.py` | Interface graphique Tkinter Linux (client IPC asynchrone) |
+| `selfishnet_windows.py` | Backend natif Windows (Npcap, ARP, relais L2 TokenBucket, Pare-feu PowerShell) |
+| `selfishnet_windows_tui.py` | Interface graphique Tkinter Windows (thème sombre, parité complète) |
+| `assets/` | Icônes (`svg`, `png`, `ico`) et base OUI hors-ligne (`oui.txt`) |
+| `docs/ANDROID_ARCHITECTURE.md` | Spécification technique & contrat API Android |
+| `install.sh` / `uninstall.sh` | Installation et désinstallation Linux |
+| `selfishnet.service` | Unité systemd sécurisée |
+| `build-release.sh` / `build-windows.ps1` | Scripts de packaging Linux et Windows |
+| `tests/` | Suite de tests automatisés `pytest` |
