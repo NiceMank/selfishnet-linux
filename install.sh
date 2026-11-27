@@ -52,6 +52,7 @@ echo 'net.ipv4.ip_forward=1' | sudo tee /etc/sysctl.d/99-selfishnet.conf >/dev/n
 echo "==> 4/5 Installation des modules, commandes, raccourci et service systemd"
 sudo mkdir -p "$LIB_DIR/assets"
 sudo install -m 0644 "$HERE/selfishnet_core.py" "$LIB_DIR/selfishnet_core.py"
+sudo install -m 0644 "$HERE/selfishnet_ui_common.py" "$LIB_DIR/selfishnet_ui_common.py"
 sudo install -m 0755 "$HERE/selfishnet.py" "$LIB_DIR/selfishnet.py"
 sudo install -m 0755 "$HERE/selfishnet_tui.py" "$LIB_DIR/selfishnet_tui.py"
 [ -f "$HERE/assets/oui.txt" ] && sudo install -m 0644 "$HERE/assets/oui.txt" "$LIB_DIR/assets/oui.txt"

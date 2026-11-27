@@ -25,10 +25,10 @@ jobs:
           python -m pip install -r requirements.txt pytest ruff
 
       - name: Lint (ruff)
-        run: ruff check selfishnet_core.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py tests
+        run: ruff check selfishnet_core.py selfishnet_ui_common.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py tests
 
       - name: Syntax check
-        run: python -m compileall -q selfishnet_core.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
+        run: python -m compileall -q selfishnet_core.py selfishnet_ui_common.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
 
       - name: Run tests
         run: python -m pytest -v
@@ -48,7 +48,7 @@ jobs:
           python -m pip install -r requirements.txt pytest
 
       - name: Syntax check
-        run: python -m compileall -q selfishnet_core.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
+        run: python -m compileall -q selfishnet_core.py selfishnet_ui_common.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
 
       - name: Run tests
         run: python -m pytest -v

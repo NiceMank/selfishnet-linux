@@ -28,7 +28,7 @@ jobs:
       - name: Build Windows executable
         shell: pwsh
         run: |
-          python -m compileall selfishnet_core.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
+          python -m compileall selfishnet_core.py selfishnet_ui_common.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
           $iconArgs = @()
           if (Test-Path "assets/selfishnet.ico") {
             $iconArgs = @("--icon", "assets/selfishnet.ico")

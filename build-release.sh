@@ -6,7 +6,7 @@ cd "$ROOT"
 
 rm -rf build dist
 python3 -m pytest -q
-python3 -m compileall -q selfishnet_core.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
+python3 -m compileall -q selfishnet_core.py selfishnet_ui_common.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
 
 if ! command -v pyinstaller >/dev/null 2>&1; then
     echo "PyInstaller requis : python3 -m pip install pyinstaller" >&2

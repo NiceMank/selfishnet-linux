@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt pyinstaller pytest
 python -m pytest -q
-python -m compileall selfishnet_core.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
+python -m compileall selfishnet_core.py selfishnet_ui_common.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
 
 $iconArgs = @()
 if (Test-Path "assets/selfishnet.ico") {
