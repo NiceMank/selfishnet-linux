@@ -3,6 +3,16 @@ name: Build Windows release
 on:
   workflow_dispatch:
   push:
+    branches: ["main", "master"]
+    paths:
+      - "selfishnet_core.py"
+      - "selfishnet_ui_common.py"
+      - "selfishnet_windows.py"
+      - "selfishnet_windows_tui.py"
+      - "assets/**"
+      - "requirements.txt"
+      - "build-windows.ps1"
+      - ".github/workflows/build-windows.yml"
     tags:
       - "v*"
 

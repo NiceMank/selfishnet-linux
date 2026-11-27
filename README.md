@@ -1,98 +1,178 @@
-# SelfishNet — Contrôleur de bande passante Wi-Fi / LAN (Linux, Windows & Android Companion)
+# SelfishNet — Contrôleur de bande passante Wi-Fi / LAN (Linux, Windows & Android)
 
 Quand les autres appareils du réseau saturent la connexion et que vos appels,
 uploads ou agents IA ralentissent, SelfishNet vous redonne la priorité : il
-**met en pause** ou **plafonne le débit** des appareils de votre choix, de façon
-entièrement réversible.
+**met en pause** ou **plafonne le débit** des appareils de votre choix, avec un
+tableau de bord temps réel (cartes KPI, graphique de débit, Mode Focus, Safe Mode,
+alias, minuteurs et export CSV/JSON).
 
 ![Interface](gui_screenshot.png)
 
 ---
 
-## 1. Installation Linux
+## Table des matières
+
+1. [Installation sur Linux](#1-installation-sur-linux)
+2. [Installation sur Windows (guide complet)](#2-installation-sur-windows-guide-complet)
+3. [Installation sur Android (APK Companion)](#3-installation-sur-android-apk-companion)
+4. [Utilisation (GUI, Console, CLI)](#4-utilisation)
+5. [Builds automatiques GitHub Actions](#5-builds-automatiques-github-actions)
+6. [Sécurité, réversibilité & limites honnêtes](#6-sécurité-réversibilité--limites-honnêtes)
+7. [Architecture des fichiers](#7-architecture-des-fichiers)
+
+---
+
+## 1. Installation sur Linux
+
+### Ce qu'il faut installer
+
+| Dépendance | Rôle | Paquet Debian / Ubuntu | Paquet Fedora (`dnf`) | Paquet Arch (`pacman`) |
+|---|---|---|---|---|
+| **Python 3.10+** | Exécution du moteur et de l'interface | `python3` `python3-pip` | `python3` `python3-pip` | `python` `python-pip` |
+| **Tkinter** | Interface graphique (`selfishnet-gui`) | `python3-tk` | `python3-tkinter` | `tk` |
+| **Scapy >= 2.5** | Découverte et paquets réseau locaux | `python3-scapy` | `python3-scapy` | `python-scapy` |
+| **iptables** | Règles de mise en pause (`DROP`) | `iptables` | `iptables` | `iptables` |
+| **iproute2 (`ip`, `tc`)** | Détection interface + bridage HTB (`limit`) | `iproute2` | `iproute` | `iproute2` |
+| **tcpdump** | Support capture réseau | `tcpdump` | `tcpdump` | `tcpdump` |
+| **PolicyKit (`pkexec`)** *(optionnel)* | Démarrer le service depuis la GUI | `policykit-1` / `pkexec` | `polkit` | `polkit` |
+
+### Installation automatique (recommandée)
 
 ```bash
+git clone https://github.com/NiceMank/selfishnet-linux.git
 cd selfishnet-linux
 bash install.sh
 ```
 
-### Prérequis Linux
+Ce que fait `install.sh` :
+1. Installe automatiquement les paquets système et Python manquants (`apt`, `dnf` ou `pacman`).
+2. Crée le groupe système `selfishnet` et y ajoute votre utilisateur (pour utiliser `selfishnet-gui` **sans `sudo`**).
+3. Active `net.ipv4.ip_forward=1`.
+4. Installe les modules dans `/usr/local/lib/selfishnet`, crée les commandes `selfishnet` et `selfishnet-gui`, ajoute le raccourci bureau et le service `systemd`.
+5. Exécute `sudo selfishnet doctor` pour vérifier que tout est opérationnel.
 
-- Distribution Linux avec `apt`, `dnf` ou `pacman`
-- Python 3.10+
-- Droits administrateur (`sudo`) pour le démon réseau
-- Outils système : `iptables`, `ip`, `tc`, `tcpdump`
-- Tkinter pour l'interface graphique (`python3-tk`)
+> **Important :** après l'installation, reconnectez votre session (ou exécutez `newgrp selfishnet`) pour activer l'accès au socket `/run/selfishnet.sock` sans `sudo`.
 
-Le script installe les dépendances, crée le groupe système `selfishnet` (pour
-permettre à votre utilisateur de piloter le démon depuis la GUI **sans `sudo`**),
-copie les modules dans `/usr/local/lib/selfishnet`, installe les commandes
-`selfishnet` et `selfishnet-gui`, et configure le service `systemd`.
-
-> Après l'installation, reconnectez votre session (ou exécutez `newgrp selfishnet`)
-> pour que l'accès au socket `/run/selfishnet.sock` soit actif sans `sudo`.
-
-Installation manuelle :
+### Lancement Linux
 
 ```bash
-sudo apt install python3-scapy python3-tk iptables iproute2 tcpdump
-sudo python3 selfishnet.py doctor
-```
-
-Démarrage :
-
-```bash
-sudo selfishnet doctor            # vérifie la machine (inclut diagnostic IPv6)
-sudo selfishnet daemon            # ou : sudo systemctl enable --now selfishnet
-selfishnet-gui                    # interface graphique (sans sudo !)
+sudo selfishnet doctor            # vérifie toutes les dépendances + IPv6
+sudo selfishnet daemon            # ou en service permanent : sudo systemctl enable --now selfishnet
+selfishnet-gui                    # interface graphique (en utilisateur normal, SANS sudo)
 ```
 
 ---
 
-## 2. Version Windows (v1.1)
+## 2. Installation sur Windows (guide complet)
 
-Téléchargez `SelfishNet-Windows-<date>.zip` depuis les artefacts GitHub Actions
-(**Build Windows release**), extrayez-le puis lancez `SelfishNet-GUI.exe` (l'élévation
-UAC Administrateur est demandée automatiquement).
+### Option A — Utiliser l'exécutable prêt à l'emploi (recommandé, sans Python)
 
-### Prérequis Windows
+#### Étape 1 : Installer le prérequis obligatoire (**Npcap**)
 
-- Windows 10 / 11 64 bits
-- **Npcap** (<https://npcap.com/#download>) installé avec le mode compatible WinPcap
+SelfishNet Windows a besoin du pilote réseau **Npcap** pour découvrir les appareils du LAN et contrôler le débit.
 
-### Fonctionnalités Windows incluses
+1. Téléchargez **Npcap** depuis le site officiel : <https://npcap.com/#download>
+2. Lancez l'installeur `npcap-x.xx.exe` en tant qu'administrateur.
+3. **Cochez impérativement** l'option :
+   - `[x] Install Npcap in WinPcap API-compatible Mode`
+4. Terminez l'installation (un redémarrage n'est généralement pas nécessaire).
 
-- Découverte passive + **balayage ARP actif (`F5`)** filtré strictement sur le sous-réseau local
-- Mesure temps réel du débit (**↑ montant / ↓ descendant**) et identification fabricant OUI hors-ligne
-- **Pause** (empoisonnement ARP + Pare-feu Windows multi-langues) et **Limite en kb/s** (relais L2 Npcap + Token Bucket)
-- **Safe Mode persistant** (PC local et passerelle protégés en permanence), **alias personnalisés** et **minuteur automatique**
-- Nettoyage garanti des règles (via PowerShell, indépendant de la langue Windows) et restauration ARP à la fermeture
+> Sans Npcap, SelfishNet Windows affiche un message guidé dès le démarrage.
 
-### Construire les releases soi-même
+#### Étape 2 : Télécharger et lancer `SelfishNet-GUI.exe`
 
-```bash
-# Linux (démon + GUI + SHA256SUMS)
-bash build-release.sh
-```
+1. Allez dans l'onglet **Actions → Build Windows release** du dépôt GitHub et téléchargez l'artefact **`selfishnet-windows-release`** (`SelfishNet-Windows-<date>.zip` + `SHA256SUMS.txt`).
+2. Extrayez l'archive ZIP dans un dossier (ex. `C:\Program Files\SelfishNet\` ou sur votre Bureau).
+3. Double-cliquez sur **`SelfishNet-GUI.exe`**.
+4. Acceptez l'invite **Contrôle de compte d'utilisateur (UAC)** : les droits **Administrateur** sont demandés automatiquement (requis pour Npcap et les règles pare-feu).
+5. Si Windows Defender / SmartScreen affiche un avertissement (exécutable non signé), cliquez sur **Informations complémentaires → Exécuter quand même**.
+
+#### Prérequis système Windows (Option A)
+
+- Windows 10 ou Windows 11 **64 bits**
+- **Npcap** installé en mode compatible WinPcap
+- Droits **Administrateur** (élévation UAC automatique)
+- **Pare-feu Windows Defender** actif (utilisé pour le mode Pause ; nettoyage PowerShell indépendant de la langue de Windows)
+- **Aucun** Python, Scapy ou PowerShell manuel requis.
+
+---
+
+### Option B — Lancer ou compiler Windows depuis les sources
+
+Si vous souhaitez exécuter depuis le code source ou générer vous-même `SelfishNet-GUI.exe` :
+
+#### Prérequis à installer
+
+1. **Python 3.12 (64 bits)** depuis <https://www.python.org/downloads/windows/>
+   - Cochez **`[x] Add python.exe to PATH`** et **`[x] tcl/tk and IDLE`** (nécessaire pour Tkinter).
+2. **Npcap** (<https://npcap.com/#download>) avec **`[x] Install Npcap in WinPcap API-compatible Mode`**.
+3. **Git for Windows** (<https://git-scm.com/download/win>) *(optionnel, pour cloner le dépôt)*.
+
+#### Lancer depuis les sources (PowerShell en Administrateur)
 
 ```powershell
-# Windows PowerShell (EXE avec icône + SHA256SUMS)
+git clone https://github.com/NiceMank/selfishnet-linux.git
+cd selfishnet-linux
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python selfishnet_windows_tui.py
+```
+
+#### Compiler votre propre `SelfishNet-GUI.exe` + ZIP + SHA256
+
+```powershell
 .\build-windows.ps1
 ```
 
+Le script exécute `pytest`, vérifie la syntaxe, compile `dist\SelfishNet-GUI.exe` avec l'icône `assets\selfishnet.ico` et crée `dist\release\SelfishNet-Windows-<date>.zip` + `SHA256SUMS.txt`.
+
+### Fonctionnalités incluses sur Windows
+
+- Découverte passive + **balayage actif (`F5`)** filtré strictement sur le sous-réseau local
+- Tableau de bord moderne : **4 cartes KPI**, **graphique temps réel**, **filtres** (`Tous` / `Actifs` / `Restreints` / `Protégés`), **tri multi-colonnes**, **menu contextuel clic droit**, **export CSV/JSON**
+- **Mode Pause** + **Mode Limite en kb/s** (relais L2 Npcap + Token Bucket) + **Mode Focus** + **minuteur automatique**
+- **Safe Mode persistant** (votre PC et la passerelle sont toujours protégés) et **alias personnalisés**
+- **Bouton Appairage Android** intégré pour piloter votre PC Windows depuis votre téléphone Android
+
 ---
 
-## 3. Préparation Android (Companion + Root/Hotspot)
+## 3. Installation sur Android (APK Companion)
 
-Le démon intègre désormais une **API REST authentifiée (Bearer token)** prête pour
-une application compagnon Android sans root :
+L'application **SelfishNet Companion** (Kotlin + Jetpack Compose Material 3) fonctionne sur **100 % des téléphones Android (Android 8.0+ / API 26+, SANS root)** en pilotant votre serveur SelfishNet (PC Linux, PC Windows ou Raspberry Pi) sur le même réseau Wi-Fi.
+
+### Option A — Installer l'APK compilé automatiquement (recommandé)
+
+1. Allez dans l'onglet **Actions → Build Android APK** sur GitHub et téléchargez l'artefact **`selfishnet-android-apk`** (`SelfishNet-Companion-<date>.apk`).
+2. Transférez le fichier `.apk` sur votre téléphone Android (ou téléchargez-le directement depuis le navigateur du téléphone).
+3. Ouvrez le fichier `.apk`. Si Android le demande, autorisez **Installer des applications inconnues** pour votre navigateur / gestionnaire de fichiers.
+4. Installez puis ouvrez **SelfishNet Companion**.
+
+### Option B — Compiler l'APK soi-même depuis les sources
+
+#### Prérequis à installer sur votre PC
+
+- **Android Studio** (Ladybug / Hedgehog ou plus récent) : <https://developer.android.com/studio>
+  - Inclut le **JDK 17** et le **Android SDK (API 35)**.
+- *(En ligne de commande sans Android Studio)* : **JDK 17** (`temurin-17`), **Android Command-Line Tools** (`platform-tools`, `platforms;android-35`, `build-tools;35.0.0`) et **Gradle 8.10.2**.
 
 ```bash
-sudo selfishnet daemon --api-bind 0.0.0.0 --api-port 8443
+cd android
+gradle --no-daemon assembleDebug
+# APK généré dans : android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Le démon affiche une URI `selfishnet://pair?...` prête pour l'appairage par QR Code.
-Consultez [docs/ANDROID_ARCHITECTURE.md](docs/ANDROID_ARCHITECTURE.md) pour le contrat API complet et l'architecture Android (Companion sans root, mode Root/Hotspot natif et connecteurs box).
+### Appairage Android ↔ PC (2 étapes)
+
+1. **Démarrez l'API sur votre PC** :
+   - Sur **Linux** :
+     ```bash
+     sudo selfishnet daemon --api-bind 0.0.0.0 --api-port 8443
+     ```
+     *(Assurez-vous que le port TCP `8443` est ouvert dans votre pare-feu local, ex. `sudo ufw allow 8443/tcp` sur votre LAN).*
+   - Sur **Windows** : cliquez simplement sur le bouton **`Appairage Android`** en haut à droite de `SelfishNet-GUI.exe` (l'URI est copiée automatiquement dans le presse-papiers ; autorisez le port `8443` dans le Pare-feu Windows sur le réseau privé si demandé).
+2. **Collez l'URI dans l'application Android** (`selfishnet://pair?host=192.168.x.x&port=8443&token=...`) puis appuyez sur **Se connecter au serveur**.
+
+Consultez [docs/ANDROID_ARCHITECTURE.md](docs/ANDROID_ARCHITECTURE.md) pour la spécification complète de l'API REST et la feuille de route du mode Root/Hotspot.
 
 ---
 
@@ -104,9 +184,10 @@ Consultez [docs/ANDROID_ARCHITECTURE.md](docs/ANDROID_ARCHITECTURE.md) pour le c
 selfishnet-gui          # Linux (utilisateur normal)
 ```
 
-- **Sélection rapide** : `Tout sélectionner` (`Ctrl+A`), `Tout désélectionner` (`Ctrl+D`), `Ctrl+clic`, `F5` (balayage ARP actif)
-- **Actions** : `Mettre en pause`, `Limiter` (en kb/s), `Durée` (minuteur auto en minutes, `0 = ∞`), `Libérer`, `Bloquer tout`, `Limiter tout`, `Libérer tout`
-- **Safe Mode & Alias** : `Protéger (Safe Mode)`, `Retirer protection`, `Renommer`
+- **Tableau de bord** : 4 cartes KPI, graphique d'activité réseau en temps réel, filtres (`Tous`, `Actifs`, `Restreints`, `Protégés`), recherche instantanée et tri sur toutes les colonnes.
+- **Presets & Focus** : `Éco 150k`, `Web 1M`, `Vidéo 2.5M`, `Mode Focus (250k)` en un clic.
+- **Menu clic droit** : Pause, Limiter, Libérer, Safe Mode, Renommer, Copier IP/MAC.
+- **Raccourcis** : `F5` / `Ctrl+R` (balayage actif), `Ctrl+A` (tout sélectionner), `Ctrl+D` (désélectionner), `Ctrl+clic` (sélection multiple).
 
 ### b) Console interactive (Linux / SSH)
 
@@ -120,10 +201,10 @@ sudo selfishnet watch
 | `l` | limiter **tous les appareils non protégés** (500 kb/s par défaut) |
 | `p` | mettre **tous les appareils non protégés** en pause |
 | `f` | tout libérer |
-| `r` | lancer un balayage ARP actif du réseau |
+| `r` | lancer un balayage actif du réseau |
 | `q` | quitter **et restaurer le réseau** |
 
-### c) Ligne de commande (scriptable)
+### c) Ligne de commande Linux (scriptable)
 
 ```bash
 sudo selfishnet scan                       # découvrir les appareils (--json dispo)
@@ -142,43 +223,49 @@ sudo selfishnet quit                       # arrête le service + restaure tout
 
 ---
 
-## 5. Sécurité, réversibilité & limites honnêtes
+## 5. Builds automatiques GitHub Actions
 
-- **Sécurité IPC** : le socket `/run/selfishnet.sock` est restreint au groupe `selfishnet` (`0660`), toutes les commandes système sont exécutées sans shell (`shell=False`) avec validation stricte IPv4/MAC/interface.
-- **Sortie propre** : à `q`, `Ctrl-C`, `quit` ou `systemctl stop`, les tables ARP sont restaurées, les règles `iptables`/`ip6tables`/`tc` sont supprimées et `net.ipv4.ip_forward` est restauré à son état initial. Filet de sécurité : `sudo selfishnet clean`.
-- **IPv6** : `sudo selfishnet doctor` signale si IPv6 est actif sur le Wi-Fi (sur une box client classique, IPv6 peut contourner un blocage IPv4 seul).
-- **AP Isolation** : si la box active l'isolation des clients Wi-Fi, l'ARP spoofing ne peut pas intercepter le trafic ; vérifiez avec `sudo selfishnet selftest <IP>`.
+Le dépôt inclut 3 workflows automatisés dans `.github/workflows/` :
 
----
+| Workflow | Fichier | Déclenchement | Artefact produit |
+|---|---|---|---|
+| **CI** | `ci.yml` | Chaque `push` et `pull_request` | Lint `ruff` + `pytest` sur Linux (Python 3.10 & 3.12) et Windows (Python 3.12) |
+| **Build Windows release** | `build-windows.yml` | Manuel (`workflow_dispatch`), tags `v*`, ou push sur fichiers Windows/core/UI | `selfishnet-windows-release` (`SelfishNet-Windows-<date>.zip` + `SHA256SUMS.txt`) |
+| **Build Android APK** | `build-android.yml` | Manuel (`workflow_dispatch`), tags `v*`, ou push sur `android/**` | `selfishnet-android-apk` (`SelfishNet-Companion-<date>.apk` + `SHA256SUMS.txt`) |
 
-## 6. Désinstallation Linux
+Pour créer une release Linux localement :
 
 ```bash
-bash uninstall.sh
+bash build-release.sh
+# Produit dist/release/SelfishNet-Linux-<date>.tar.gz (démon + GUI) + SHA256SUMS.txt
 ```
 
 ---
 
-## 7. Avertissement légal
+## 6. Sécurité, réversibilité & limites honnêtes
 
-Cet outil modifie le trafic du réseau local. Ne l'utilisez que sur **votre propre réseau**
-et sur des appareils dont vous êtes responsable (votre box, votre partage de connexion,
-votre domicile).
+- **Sécurité IPC** : le socket `/run/selfishnet.sock` est restreint au groupe `selfishnet` (`0660`), toutes les commandes système s'exécutent sans shell (`shell=False`) avec validation stricte IPv4/MAC/interface.
+- **Sortie propre** : à `q`, `Ctrl-C`, `quit` ou `systemctl stop`, les tables ARP sont restaurées, les règles `iptables`/`ip6tables`/`tc` (ou Pare-feu Windows) sont supprimées et `net.ipv4.ip_forward` est remis à son état initial. Filet de sécurité Linux : `sudo selfishnet clean`.
+- **Désinstallation Linux** : `bash uninstall.sh`.
+- **IPv6 & AP Isolation** : `sudo selfishnet doctor` signale si IPv6 est actif sur le Wi-Fi. Si la box active l'isolation des clients Wi-Fi (AP Isolation), vérifiez avec `sudo selfishnet selftest <IP>`.
+- **Usage responsable** : n'utilisez cet outil que sur **votre propre réseau** et sur des appareils dont vous êtes responsable.
 
 ---
 
-## 8. Architecture des fichiers
+## 7. Architecture des fichiers
 
-| Fichier | Rôle |
+| Fichier / Dossier | Rôle |
 |---|---|
 | `selfishnet_core.py` | Noyau partagé (validation stricte, OUI, alias, minuteurs, TokenBucket, IPC, API Companion Android) |
-| `selfishnet.py` | Moteur Linux (ARP, iptables/ip6tables, tc HTB/ingress), démon IPC, CLI & TUI |
-| `selfishnet_tui.py` | Interface graphique Tkinter Linux (client IPC asynchrone) |
-| `selfishnet_windows.py` | Backend natif Windows (Npcap, ARP, relais L2 TokenBucket, Pare-feu PowerShell) |
-| `selfishnet_windows_tui.py` | Interface graphique Tkinter Windows (thème sombre, parité complète) |
+| `selfishnet_ui_common.py` | Composants UX partagés (thème sombre, cartes KPI, graphique temps réel, filtres, tri, export CSV/JSON) |
+| `selfishnet.py` | Moteur Linux, démon IPC, CLI & TUI console |
+| `selfishnet_tui.py` | Interface graphique Tkinter Linux |
+| `selfishnet_windows.py` | Backend natif Windows (Npcap, relais L2 TokenBucket, Pare-feu PowerShell multi-langues) |
+| `selfishnet_windows_tui.py` | Interface graphique Tkinter Windows |
+| `android/` | Projet Android Studio complet (Kotlin + Jetpack Compose Material 3) |
 | `assets/` | Icônes (`svg`, `png`, `ico`) et base OUI hors-ligne (`oui.txt`) |
 | `docs/ANDROID_ARCHITECTURE.md` | Spécification technique & contrat API Android |
 | `install.sh` / `uninstall.sh` | Installation et désinstallation Linux |
 | `selfishnet.service` | Unité systemd sécurisée |
 | `build-release.sh` / `build-windows.ps1` | Scripts de packaging Linux et Windows |
-| `tests/` | Suite de tests automatisés `pytest` |
+| `tests/` | Suite de tests automatisés `pytest` (31 tests) |
