@@ -21,7 +21,10 @@ Avertissement : ne l'utilisez que sur VOTRE réseau / des appareils dont vous
 """
 
 import argparse
-import grp
+try:
+    import grp
+except ImportError:
+    grp = None
 import ipaddress
 import json
 import os
@@ -1410,12 +1413,13 @@ class Daemon:
             os.chmod(SOCK_FILE, 0o666)
             return
         gid = None
-        for group_name in ("selfishnet", "sudo", "wheel"):
-            try:
-                gid = grp.getgrnam(group_name).gr_gid
-                break
-            except KeyError:
-                continue
+        if grp is not None:
+            for group_name in ("selfishnet", "sudo", "wheel"):
+                try:
+                    gid = grp.getgrnam(group_name).gr_gid
+                    break
+                except KeyError:
+                    continue
         if gid is None:
             sudo_gid = os.environ.get("SUDO_GID")
             if sudo_gid and sudo_gid.isdigit():
