@@ -2,6 +2,11 @@ name: Build Android APK
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Optional GitHub Release tag to attach assets to (e.g. v1.1.0)"
+        required: false
+        default: ""
   push:
     branches: ["main", "master"]
     paths:
@@ -9,6 +14,9 @@ on:
       - ".github/workflows/build-android.yml"
     tags:
       - "v*"
+
+permissions:
+  contents: write
 
 jobs:
   android:
@@ -45,7 +53,7 @@ jobs:
           APK_SRC="android/app/build/outputs/apk/debug/app-debug.apk"
           APK_OUT="dist/android/SelfishNet-Companion-${DATE}.apk"
           cp "$APK_SRC" "$APK_OUT"
-          (cd dist/android && sha256sum "$(basename "$APK_OUT")" > SHA256SUMS.txt)
+          (cd dist/android && sha256sum "$(basename "$APK_OUT")" > SHA256SUMS-Android.txt)
           ls -lh dist/android/
 
       - name: Upload Android APK artifact
@@ -53,3 +61,11 @@ jobs:
         with:
           name: selfishnet-android-apk
           path: dist/android/*
+
+      - name: Attach Android APK to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ inputs.release_tag || github.ref_name }}
+        run: |
+          gh release upload "$TAG_NAME" dist/android/* --clobber
