@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-SelfishNet Windows — Interface graphique Tkinter (UX moderne v1.1, parité Linux).
+MyNet Filter Windows — Interface graphique Tkinter (UX moderne v1.1, parité Linux).
 """
 
 import os
@@ -16,13 +16,13 @@ _HERE = os.path.dirname(os.path.realpath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-from selfishnet_core import (
+from mynet_filter_core import (
     VERSION,
     human_rate_short,
     is_valid_mac,
     resource_path,
 )
-from selfishnet_ui_common import (
+from mynet_filter_ui_common import (
     FOCUS_MODE_RATE_KBIT,
     PRESET_RATES,
     THEME,
@@ -35,7 +35,7 @@ from selfishnet_ui_common import (
     sort_devices,
     update_kpi_bar,
 )
-from selfishnet_windows import WindowsNetwork
+from mynet_filter_windows import WindowsNetwork
 
 REFRESH_MS = 1500
 MAX_LOG_LINES = 500
@@ -72,12 +72,12 @@ class App:
         root.bind("<Control-r>", lambda _e: (self.rescan(), "break")[1])
         root.bind("<Control-R>", lambda _e: (self.rescan(), "break")[1])
 
-        threading.Thread(target=self._init_backend, daemon=True, name="SelfishNetInit").start()
+        threading.Thread(target=self._init_backend, daemon=True, name="MyNetFilterInit").start()
         root.after(400, self.tick)
 
     def _load_icon(self):
-        ico_path = resource_path(os.path.join("assets", "selfishnet.ico"))
-        png_path = resource_path(os.path.join("assets", "selfishnet.png"))
+        ico_path = resource_path(os.path.join("assets", "mynet_filter.ico"))
+        png_path = resource_path(os.path.join("assets", "mynet_filter.png"))
         if os.name == "nt" and os.path.isfile(ico_path):
             try:
                 self.root.iconbitmap(ico_path)

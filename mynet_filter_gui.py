@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-SelfishNet-Linux — Interface graphique Tkinter (UX moderne v1.1).
+MyNet Filter — Interface graphique Tkinter (UX moderne v1.1).
 
 Architecture client-serveur :
-- Le démon root (service systemd ou « sudo selfishnet daemon ») gère le réseau local.
-- L'interface s'exécute avec les privilèges utilisateur normaux via /run/selfishnet.sock.
+- Le démon root (service systemd ou « sudo mynet-filter daemon ») gère le réseau local.
+- L'interface s'exécute avec les privilèges utilisateur normaux via /run/mynet-filter.sock.
 """
 
 import os
@@ -22,14 +22,14 @@ _HERE = os.path.dirname(os.path.realpath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-from selfishnet_core import (
+from mynet_filter_core import (
     VERSION,
     human_rate_short,
     ipc_request,
     is_valid_mac,
     resource_path,
 )
-from selfishnet_ui_common import (
+from mynet_filter_ui_common import (
     FOCUS_MODE_RATE_KBIT,
     PRESET_RATES,
     THEME,
@@ -43,23 +43,23 @@ from selfishnet_ui_common import (
     update_kpi_bar,
 )
 
-SOCK_FILE = "/run/selfishnet.sock"
+SOCK_FILE = "/run/mynet-filter.sock"
 REFRESH_MS = 1500
 MAX_LOG_LINES = 500
 
 
 def get_daemon_bin():
     candidates = [
-        shutil.which("selfishnet"),
-        "/usr/local/bin/selfishnet",
-        "/usr/local/sbin/selfishnet",
-        os.path.join(_HERE, "selfishnet"),
-        os.path.join(_HERE, "selfishnet.py"),
+        shutil.which("mynet-filter"),
+        "/usr/local/bin/mynet-filter",
+        "/usr/local/sbin/mynet-filter",
+        os.path.join(_HERE, "mynet-filter"),
+        os.path.join(_HERE, "mynet_filter.py"),
     ]
     for c in candidates:
         if c and os.path.isfile(c) and os.access(c, os.X_OK):
             return c
-    return "selfishnet"
+    return "mynet-filter"
 
 
 def ipc(payload, timeout=12):
@@ -93,9 +93,9 @@ class App:
         root.minsize(1020, 640)
 
         for icon_path in [
-            resource_path(os.path.join("assets", "selfishnet.png")),
-            os.path.expanduser("~/.local/share/icons/hicolor/256x256/apps/selfishnet.png"),
-            "/usr/share/icons/hicolor/256x256/apps/selfishnet.png",
+            resource_path(os.path.join("assets", "mynet_filter.png")),
+            os.path.expanduser("~/.local/share/icons/hicolor/256x256/apps/mynet-filter.png"),
+            "/usr/share/icons/hicolor/256x256/apps/mynet-filter.png",
         ]:
             if icon_path and os.path.isfile(icon_path):
                 try:
@@ -404,7 +404,7 @@ class App:
             self.say("Le service n'est pas lancé. Cliquez sur « Démarrer le service ».")
             return
         if err == "permission_denied":
-            self.say("Permission refusée sur /run/selfishnet.sock (vérifiez le groupe 'selfishnet').")
+            self.say("Permission refusée sur /run/mynet-filter.sock (vérifiez le groupe 'mynet-filter').")
             return
         if err == "timeout":
             self.say("L'action a été transmise au service d'arrière-plan.")
@@ -553,7 +553,7 @@ class App:
             if not self.btn_fix_perms.winfo_ismapped():
                 self.btn_fix_perms.pack(side="right", padx=(8, 0))
             self.lbl_net.configure(
-                text="Accès refusé au socket (/run/selfishnet.sock) — cliquez sur « Corriger permissions »",
+                text="Accès refusé au socket (/run/mynet-filter.sock) — cliquez sur « Corriger permissions »",
                 fg=THEME["red"],
             )
             return
@@ -653,14 +653,14 @@ class App:
         import getpass
         user = getpass.getuser()
         if not shutil.which("pkexec"):
-            self.say(f"Exécutez en terminal : sudo usermod -aG selfishnet {user} && sudo setfacl -m u:{user}:rw {SOCK_FILE}")
+            self.say(f"Exécutez en terminal : sudo usermod -aG mynet-filter {user} && sudo setfacl -m u:{user}:rw {SOCK_FILE}")
             return
 
         def job():
             script = (
-                f"groupadd -rf selfishnet && "
-                f"usermod -aG selfishnet {user} && "
-                f"(setfacl -m u:{user}:rw {SOCK_FILE} 2>/dev/null || chgrp selfishnet {SOCK_FILE})"
+                f"groupadd -rf mynet-filter && "
+                f"usermod -aG mynet-filter {user} && "
+                f"(setfacl -m u:{user}:rw {SOCK_FILE} 2>/dev/null || chgrp mynet-filter {SOCK_FILE})"
             )
             p = subprocess.run(["pkexec", "sh", "-c", script], capture_output=True, text=True, check=False)
             if p.returncode != 0:
@@ -687,13 +687,13 @@ class App:
             has_systemd = False
             if shutil.which("systemctl"):
                 p = subprocess.run(
-                    ["systemctl", "list-unit-files", "selfishnet.service"],
+                    ["systemctl", "list-unit-files", "mynet_filter.service"],
                     capture_output=True, text=True, check=False,
                 )
-                has_systemd = (p.returncode == 0 and "selfishnet.service" in p.stdout)
+                has_systemd = (p.returncode == 0 and "mynet_filter.service" in p.stdout)
             if has_systemd and os.geteuid() != 0 and shutil.which("pkexec"):
                 subprocess.Popen(
-                    ["pkexec", "systemctl", "start", "selfishnet"],
+                    ["pkexec", "systemctl", "start", "mynet-filter"],
                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                     start_new_session=True,
                 )
@@ -719,7 +719,7 @@ def main():
         root = tk.Tk()
     except tk.TclError as exc:
         sys.exit(f"Impossible d'ouvrir une fenêtre graphique ({exc}).\n"
-                 "Utilisez plutôt la console : sudo selfishnet watch")
+                 "Utilisez plutôt la console : sudo mynet-filter watch")
     App(root)
     root.mainloop()
 

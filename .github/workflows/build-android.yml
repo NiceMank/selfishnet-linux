@@ -59,7 +59,7 @@ jobs:
       - name: Upload Android APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: selfishnet-android-apk
+          name: mynet-filter-android-apk
           path: dist/android/*
 
       - name: Attach Android APK to GitHub Release

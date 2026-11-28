@@ -3,10 +3,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-import selfishnet as sn
+import mynet_filter as sn
 
 from unittest.mock import patch
-import selfishnet_windows as snw
+import mynet_filter_windows as snw
 
 
 def test_human_rate():
@@ -93,11 +93,11 @@ def test_save_and_load_state(tmp_path, monkeypatch):
 
 
 def test_firewall_rule_name():
-    assert snw.firewall_rule_name("192.168.1.42", "In") == "SelfishNet-In-192_168_1_42"
+    assert snw.firewall_rule_name("192.168.1.42", "In") == "MyNetFilter-In-192_168_1_42"
 
 
 def test_pause_ip_creates_in_and_out_rules():
-    with patch("selfishnet_windows.run_netsh", return_value=(0, "ok")) as run:
+    with patch("mynet_filter_windows.run_netsh", return_value=(0, "ok")) as run:
         assert snw.pause_ip("192.168.1.42")
         assert run.call_count == 4
         commands = [call.args for call in run.call_args_list]

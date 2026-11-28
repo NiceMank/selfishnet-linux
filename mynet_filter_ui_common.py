@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-SelfishNet UI Common — composants UX modernes partagés entre Linux et Windows.
+MyNet Filter UI Common — composants UX modernes partagés entre Linux et Windows.
 
 Contient :
   * palette sombre moderne (cartes élevées, bordures subtiles, états sémantiques) ;
@@ -14,7 +14,7 @@ import csv
 import json
 from collections import deque
 
-from selfishnet_core import human_rate_short, sort_key_ip
+from mynet_filter_core import human_rate_short, sort_key_ip
 
 # Palette sombre moderne (Slate / GitHub Dark Refined)
 THEME = {

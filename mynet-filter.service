@@ -1,15 +1,15 @@
 [Unit]
 Description=MyNet Filter — contrôle de la bande passante du réseau partagé
-Documentation=file:/usr/local/lib/selfishnet/selfishnet.py
+Documentation=file:/usr/local/lib/mynet-filter/mynet_filter.py
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /usr/local/lib/selfishnet/selfishnet.py daemon
+ExecStart=/usr/bin/python3 /usr/local/lib/mynet-filter/mynet_filter.py daemon
 KillSignal=SIGTERM
 TimeoutStopSec=15
-ExecStopPost=/usr/bin/python3 /usr/local/lib/selfishnet/selfishnet.py clean
+ExecStopPost=/usr/bin/python3 /usr/local/lib/mynet-filter/mynet_filter.py clean
 Restart=on-failure
 RestartSec=3
 # Le service a besoin du réseau brut et du chargement de modules noyau (htb/xt_mac)

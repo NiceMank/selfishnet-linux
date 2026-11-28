@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-import selfishnet_ui_common as ui
+import mynet_filter_ui_common as ui
 
 
 SAMPLE_DEVICES = [

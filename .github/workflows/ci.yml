@@ -25,10 +25,10 @@ jobs:
           python -m pip install -r requirements.txt pytest ruff
 
       - name: Lint (ruff)
-        run: ruff check selfishnet_core.py selfishnet_ui_common.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py tests
+        run: ruff check mynet_filter_core.py mynet_filter_ui_common.py mynet_filter.py mynet_filter_gui.py mynet_filter_windows.py mynet_filter_windows_gui.py tests
 
       - name: Syntax check
-        run: python -m compileall -q selfishnet_core.py selfishnet_ui_common.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
+        run: python -m compileall -q mynet_filter_core.py mynet_filter_ui_common.py mynet_filter.py mynet_filter_gui.py mynet_filter_windows.py mynet_filter_windows_gui.py
 
       - name: Run tests
         run: python -m pytest -v
@@ -48,7 +48,7 @@ jobs:
           python -m pip install -r requirements.txt pytest
 
       - name: Syntax check
-        run: python -m compileall -q selfishnet_core.py selfishnet_ui_common.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
+        run: python -m compileall -q mynet_filter_core.py mynet_filter_ui_common.py mynet_filter.py mynet_filter_gui.py mynet_filter_windows.py mynet_filter_windows_gui.py
 
       - name: Run tests
         run: python -m pytest -v

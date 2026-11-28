@@ -1,6 +1,6 @@
-# Architecture & Spécification — Version Android de SelfishNet
+# Architecture & Spécification — Version Android de MyNet Filter
 
-Ce document prépare le développement de l'application Android **SelfishNet Mobile** et décrit le contrat d'API déjà implémenté dans `selfishnet_core.py` (`RemoteAPIServer`).
+Ce document prépare le développement de l'application Android **MyNet Filter Mobile** et décrit le contrat d'API déjà implémenté dans `mynet_filter_core.py` (`RemoteAPIServer`).
 
 ---
 
@@ -13,7 +13,7 @@ Sur Android **non rooté** (Android 10–15+), SELinux et le noyau interdisent :
 
 L'application Android adopte donc une **architecture modulaire en 3 modes** :
 
-1. **Mode Companion (Sans Root — 100 % des smartphones)** : pilote à distance le démon SelfishNet tournant sur un PC Linux, un PC Windows ou un Raspberry Pi du réseau local via l'API REST authentifiée déjà intégrée.
+1. **Mode Companion (Sans Root — 100 % des smartphones)** : pilote à distance le démon MyNet Filter tournant sur un PC Linux, un PC Windows ou un Raspberry Pi du réseau local via l'API REST authentifiée déjà intégrée.
 2. **Mode Autonome Root / Hotspot (Magisk / KernelSU)** : embarque un helper natif Rust/Go cross-compilé (`arm64-v8a` / `armeabi-v7a`) lancé via `su` et un `ForegroundService` Android (excellent en partage de connexion où le smartphone est la passerelle).
 3. **Mode API Routeur (Sans Root)** : connecteurs optionnels vers les API locales des box (Freebox OS, OpenWrt ubus/LuCI, MikroTik, UniFi).
 
@@ -24,13 +24,13 @@ L'application Android adopte donc une **architecture modulaire en 3 modes** :
 ### Démarrage côté PC Linux / Raspberry Pi
 
 ```bash
-sudo selfishnet daemon --api-bind 0.0.0.0 --api-port 8443
+sudo mynet-filter daemon --api-bind 0.0.0.0 --api-port 8443
 ```
 
 Le démon affiche automatiquement une URI d'appairage destinée à être encodée en QR Code :
 
 ```text
-selfishnet://pair?host=192.168.1.20&port=8443&token=<TOKEN_256_BITS>&name=SelfishNet-PC&v=1
+mynetfilter://pair?host=192.168.1.20&port=8443&token=<TOKEN_256_BITS>&name=MyNetFilter-PC&v=1
 ```
 
 ### Authentification
@@ -68,7 +68,7 @@ android/
 │   │   ├── CompanionClient.kt    # Client OkHttp/Ktor vers /api/v1/* + découverte mDNS (NsdManager)
 │   │   └── RootEngineBridge.kt   # Communication Unix socket avec le binaire natif root
 │   └── service/
-│       └── SelfishNetService.kt  # ForegroundService + notification persistante "Tout libérer"
+│       └── MyNetFilterService.kt  # ForegroundService + notification persistante "Tout libérer"
 └── native-engine/                # Crate Rust (ou Go) cross-compilé arm64-v8a / armeabi-v7a
     ├── src/arp.rs                # Découverte & ARP spoofing (AF_PACKET)
     ├── src/hotspot.rs            # Mode AP/Hotspot direct (sans ARP spoofing)

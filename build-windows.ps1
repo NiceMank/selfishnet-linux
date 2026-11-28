@@ -3,11 +3,11 @@ $ErrorActionPreference = "Stop"
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt pyinstaller pytest
 python -m pytest -q
-python -m compileall selfishnet_core.py selfishnet_ui_common.py selfishnet.py selfishnet_tui.py selfishnet_windows.py selfishnet_windows_tui.py
+python -m compileall mynet_filter_core.py mynet_filter_ui_common.py mynet_filter.py mynet_filter_gui.py mynet_filter_windows.py mynet_filter_windows_gui.py
 
 $iconArgs = @()
-if (Test-Path "assets/selfishnet.ico") {
-    $iconArgs = @("--icon", "assets/selfishnet.ico")
+if (Test-Path "assets/mynet-filter.ico") {
+    $iconArgs = @("--icon", "assets/mynet-filter.ico")
 }
 
 pyinstaller --clean --noconfirm `
@@ -17,7 +17,7 @@ pyinstaller --clean --noconfirm `
     @iconArgs `
     --collect-submodules scapy `
     --add-data "assets;assets" `
-    selfishnet_windows_tui.py
+    mynet_filter_windows_gui.py
 
 $date = Get-Date -Format "yyyyMMdd"
 New-Item -ItemType Directory -Force -Path dist/release | Out-Null

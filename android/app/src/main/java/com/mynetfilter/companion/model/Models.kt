@@ -1,4 +1,4 @@
-package com.selfishnet.companion.model
+package com.mynetfilter.companion.model
 
 import android.net.Uri
 
@@ -13,7 +13,7 @@ data class PairingConfig(
     companion object {
         fun fromUri(raw: String): PairingConfig? {
             val uri = Uri.parse(raw.trim())
-            if (uri.scheme != "selfishnet" || uri.host != "pair") return null
+            if (uri.scheme != "mynetfilter" || uri.host != "pair") return null
             val host = uri.getQueryParameter("host")?.takeIf { it.isNotBlank() } ?: return null
             val token = uri.getQueryParameter("token")?.takeIf { it.isNotBlank() } ?: return null
             val port = uri.getQueryParameter("port")?.toIntOrNull() ?: 8443

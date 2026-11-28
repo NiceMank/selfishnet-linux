@@ -1,2 +1,2 @@
-# ProGuard rules for SelfishNet Companion
--keep class com.selfishnet.companion.model.** { *; }
+# ProGuard rules for MyNet Filter Companion
+-keep class com.mynetfilter.companion.model.** { *; }

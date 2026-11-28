@@ -1,8 +1,8 @@
-package com.selfishnet.companion.data
+package com.mynetfilter.companion.data
 
-import com.selfishnet.companion.model.NetworkDevice
-import com.selfishnet.companion.model.PairingConfig
-import com.selfishnet.companion.model.StatusSnapshot
+import com.mynetfilter.companion.model.NetworkDevice
+import com.mynetfilter.companion.model.PairingConfig
+import com.mynetfilter.companion.model.StatusSnapshot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject

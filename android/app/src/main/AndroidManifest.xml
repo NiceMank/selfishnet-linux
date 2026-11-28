@@ -22,7 +22,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="selfishnet" android:host="pair" />
+                <data android:scheme="mynetfilter" android:host="pair" />
             </intent-filter>
         </activity>
     </application>

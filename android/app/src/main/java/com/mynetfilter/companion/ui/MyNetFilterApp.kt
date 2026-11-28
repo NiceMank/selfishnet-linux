@@ -1,4 +1,4 @@
-package com.selfishnet.companion.ui
+package com.mynetfilter.companion.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,10 +13,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.selfishnet.companion.data.CompanionApiClient
-import com.selfishnet.companion.model.NetworkDevice
-import com.selfishnet.companion.model.PairingConfig
-import com.selfishnet.companion.model.StatusSnapshot
+import com.mynetfilter.companion.data.CompanionApiClient
+import com.mynetfilter.companion.model.NetworkDevice
+import com.mynetfilter.companion.model.PairingConfig
+import com.mynetfilter.companion.model.StatusSnapshot
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -37,7 +37,7 @@ private val DarkPalette = darkColorScheme(
 )
 
 @Composable
-fun SelfishNetApp(initialPairingUri: String? = null) {
+fun MyNetFilterApp(initialPairingUri: String? = null) {
     MaterialTheme(colorScheme = DarkPalette) {
         var config by remember { mutableStateOf(initialPairingUri?.let { PairingConfig.fromUri(it) }) }
 
@@ -79,7 +79,7 @@ private fun PairingScreen(initialUri: String, onPaired: (PairingConfig) -> Unit)
         OutlinedTextField(
             value = uriText,
             onValueChange = { uriText = it; errorMsg = null },
-            label = { Text("URI d'appairage (selfishnet://pair?...)") },
+            label = { Text("URI d'appairage (mynetfilter://pair?...)") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = false,
             maxLines = 4,
@@ -93,7 +93,7 @@ private fun PairingScreen(initialUri: String, onPaired: (PairingConfig) -> Unit)
             onClick = {
                 val parsed = PairingConfig.fromUri(uriText)
                 if (parsed == null) {
-                    errorMsg = "URI invalide. Exemple : selfishnet://pair?host=192.168.1.10&port=8443&token=..."
+                    errorMsg = "URI invalide. Exemple : mynetfilter://pair?host=192.168.1.10&port=8443&token=..."
                 } else {
                     onPaired(parsed)
                 }

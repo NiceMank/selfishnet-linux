@@ -29,7 +29,7 @@ alias, minuteurs et export CSV/JSON).
 | Dépendance | Rôle | Paquet Debian / Ubuntu | Paquet Fedora (`dnf`) | Paquet Arch (`pacman`) |
 |---|---|---|---|---|
 | **Python 3.10+** | Exécution du moteur et de l'interface | `python3` `python3-pip` | `python3` `python3-pip` | `python` `python-pip` |
-| **Tkinter** | Interface graphique (`selfishnet-gui`) | `python3-tk` | `python3-tkinter` | `tk` |
+| **Tkinter** | Interface graphique (`mynet-filter-gui`) | `python3-tk` | `python3-tkinter` | `tk` |
 | **Scapy >= 2.5** | Découverte et paquets réseau locaux | `python3-scapy` | `python3-scapy` | `python-scapy` |
 | **iptables** | Règles de mise en pause (`DROP`) | `iptables` | `iptables` | `iptables` |
 | **iproute2 (`ip`, `tc`)** | Détection interface + bridage HTB (`limit`) | `iproute2` | `iproute` | `iproute2` |
@@ -39,26 +39,26 @@ alias, minuteurs et export CSV/JSON).
 ### Installation automatique (recommandée)
 
 ```bash
-git clone https://github.com/NiceMank/selfishnet-linux.git
-cd selfishnet-linux
+git clone https://github.com/NiceMank/mynet-filter.git
+cd mynet-filter
 bash install.sh
 ```
 
 Ce que fait `install.sh` :
 1. Installe automatiquement les paquets système et Python manquants (`apt`, `dnf` ou `pacman`).
-2. Crée le groupe système `selfishnet` et y ajoute votre utilisateur (pour utiliser `selfishnet-gui` **sans `sudo`**).
+2. Crée le groupe système `mynet-filter` et y ajoute votre utilisateur (pour utiliser `mynet-filter-gui` **sans `sudo`**).
 3. Active `net.ipv4.ip_forward=1`.
-4. Installe les modules dans `/usr/local/lib/selfishnet`, crée les commandes `selfishnet` et `selfishnet-gui`, ajoute le raccourci bureau et le service `systemd`.
-5. Exécute `sudo selfishnet doctor` pour vérifier que tout est opérationnel.
+4. Installe les modules dans `/usr/local/lib/mynet-filter`, crée les commandes `mynet-filter` et `mynet-filter-gui`, ajoute le raccourci bureau et le service `systemd`.
+5. Exécute `sudo mynet-filter doctor` pour vérifier que tout est opérationnel.
 
-> **Important :** après l'installation, reconnectez votre session (ou exécutez `newgrp selfishnet`) pour activer l'accès au socket `/run/selfishnet.sock` sans `sudo`.
+> **Important :** après l'installation, reconnectez votre session (ou exécutez `newgrp mynet-filter`) pour activer l'accès au socket `/run/mynet-filter.sock` sans `sudo`.
 
 ### Lancement Linux
 
 ```bash
-sudo selfishnet doctor            # vérifie toutes les dépendances + IPv6
-sudo selfishnet daemon            # ou en service permanent : sudo systemctl enable --now selfishnet
-selfishnet-gui                    # interface graphique (en utilisateur normal, SANS sudo)
+sudo mynet-filter doctor            # vérifie toutes les dépendances + IPv6
+sudo mynet-filter daemon            # ou en service permanent : sudo systemctl enable --now mynet-filter
+mynet-filter-gui                    # interface graphique (en utilisateur normal, SANS sudo)
 ```
 
 ---
@@ -69,7 +69,7 @@ selfishnet-gui                    # interface graphique (en utilisateur normal, 
 
 #### Étape 1 : Installer le prérequis obligatoire (**Npcap**)
 
-SelfishNet Windows a besoin du pilote réseau **Npcap** pour découvrir les appareils du LAN et contrôler le débit.
+MyNet Filter Windows a besoin du pilote réseau **Npcap** pour découvrir les appareils du LAN et contrôler le débit.
 
 1. Téléchargez **Npcap** depuis le site officiel : <https://npcap.com/#download>
 2. Lancez l'installeur `npcap-x.xx.exe` en tant qu'administrateur.
@@ -77,13 +77,13 @@ SelfishNet Windows a besoin du pilote réseau **Npcap** pour découvrir les appa
    - `[x] Install Npcap in WinPcap API-compatible Mode`
 4. Terminez l'installation (un redémarrage n'est généralement pas nécessaire).
 
-> Sans Npcap, SelfishNet Windows affiche un message guidé dès le démarrage.
+> Sans Npcap, MyNet Filter Windows affiche un message guidé dès le démarrage.
 
-#### Étape 2 : Télécharger et lancer `SelfishNet-GUI.exe`
+#### Étape 2 : Télécharger et lancer `MyNet-Filter-GUI.exe`
 
-1. Allez dans l'onglet **Actions → Build Windows release** du dépôt GitHub et téléchargez l'artefact **`selfishnet-windows-release`** (`SelfishNet-Windows-<date>.zip` + `SHA256SUMS.txt`).
-2. Extrayez l'archive ZIP dans un dossier (ex. `C:\Program Files\SelfishNet\` ou sur votre Bureau).
-3. Double-cliquez sur **`SelfishNet-GUI.exe`**.
+1. Allez dans l'onglet **Actions → Build Windows release** du dépôt GitHub et téléchargez l'artefact **`mynet-filter-windows-release`** (`MyNet-Filter-Windows-<date>.zip` + `SHA256SUMS.txt`).
+2. Extrayez l'archive ZIP dans un dossier (ex. `C:\Program Files\MyNet Filter\` ou sur votre Bureau).
+3. Double-cliquez sur **`MyNet-Filter-GUI.exe`**.
 4. Acceptez l'invite **Contrôle de compte d'utilisateur (UAC)** : les droits **Administrateur** sont demandés automatiquement (requis pour Npcap et les règles pare-feu).
 5. Si Windows Defender / SmartScreen affiche un avertissement (exécutable non signé), cliquez sur **Informations complémentaires → Exécuter quand même**.
 
@@ -99,7 +99,7 @@ SelfishNet Windows a besoin du pilote réseau **Npcap** pour découvrir les appa
 
 ### Option B — Lancer ou compiler Windows depuis les sources
 
-Si vous souhaitez exécuter depuis le code source ou générer vous-même `SelfishNet-GUI.exe` :
+Si vous souhaitez exécuter depuis le code source ou générer vous-même `MyNet-Filter-GUI.exe` :
 
 #### Prérequis à installer
 
@@ -111,20 +111,20 @@ Si vous souhaitez exécuter depuis le code source ou générer vous-même `Selfi
 #### Lancer depuis les sources (PowerShell en Administrateur)
 
 ```powershell
-git clone https://github.com/NiceMank/selfishnet-linux.git
-cd selfishnet-linux
+git clone https://github.com/NiceMank/mynet-filter.git
+cd mynet-filter
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-python selfishnet_windows_tui.py
+python mynet_filter_windows_gui.py
 ```
 
-#### Compiler votre propre `SelfishNet-GUI.exe` + ZIP + SHA256
+#### Compiler votre propre `MyNet-Filter-GUI.exe` + ZIP + SHA256
 
 ```powershell
 .\build-windows.ps1
 ```
 
-Le script exécute `pytest`, vérifie la syntaxe, compile `dist\SelfishNet-GUI.exe` avec l'icône `assets\selfishnet.ico` et crée `dist\release\SelfishNet-Windows-<date>.zip` + `SHA256SUMS.txt`.
+Le script exécute `pytest`, vérifie la syntaxe, compile `dist\MyNet-Filter-GUI.exe` avec l'icône `assets\mynet-filter.ico` et crée `dist\release\MyNet-Filter-Windows-<date>.zip` + `SHA256SUMS.txt`.
 
 ### Fonctionnalités incluses sur Windows
 
@@ -138,14 +138,14 @@ Le script exécute `pytest`, vérifie la syntaxe, compile `dist\SelfishNet-GUI.e
 
 ## 3. Installation sur Android (APK Companion)
 
-L'application **SelfishNet Companion** (Kotlin + Jetpack Compose Material 3) fonctionne sur **100 % des téléphones Android (Android 8.0+ / API 26+, SANS root)** en pilotant votre serveur SelfishNet (PC Linux, PC Windows ou Raspberry Pi) sur le même réseau Wi-Fi.
+L'application **MyNet Filter Companion** (Kotlin + Jetpack Compose Material 3) fonctionne sur **100 % des téléphones Android (Android 8.0+ / API 26+, SANS root)** en pilotant votre serveur MyNet Filter (PC Linux, PC Windows ou Raspberry Pi) sur le même réseau Wi-Fi.
 
 ### Option A — Installer l'APK compilé automatiquement (recommandé)
 
-1. Allez dans l'onglet **Actions → Build Android APK** sur GitHub et téléchargez l'artefact **`selfishnet-android-apk`** (`SelfishNet-Companion-<date>.apk`).
+1. Allez dans l'onglet **Actions → Build Android APK** sur GitHub et téléchargez l'artefact **`mynet-filter-android-apk`** (`MyNet-Filter-Android-<date>.apk`).
 2. Transférez le fichier `.apk` sur votre téléphone Android (ou téléchargez-le directement depuis le navigateur du téléphone).
 3. Ouvrez le fichier `.apk`. Si Android le demande, autorisez **Installer des applications inconnues** pour votre navigateur / gestionnaire de fichiers.
-4. Installez puis ouvrez **SelfishNet Companion**.
+4. Installez puis ouvrez **MyNet Filter Companion**.
 
 ### Option B — Compiler l'APK soi-même depuis les sources
 
@@ -166,11 +166,11 @@ gradle --no-daemon assembleDebug
 1. **Démarrez l'API sur votre PC** :
    - Sur **Linux** :
      ```bash
-     sudo selfishnet daemon --api-bind 0.0.0.0 --api-port 8443
+     sudo mynet-filter daemon --api-bind 0.0.0.0 --api-port 8443
      ```
      *(Assurez-vous que le port TCP `8443` est ouvert dans votre pare-feu local, ex. `sudo ufw allow 8443/tcp` sur votre LAN).*
-   - Sur **Windows** : cliquez simplement sur le bouton **`Appairage Android`** en haut à droite de `SelfishNet-GUI.exe` (l'URI est copiée automatiquement dans le presse-papiers ; autorisez le port `8443` dans le Pare-feu Windows sur le réseau privé si demandé).
-2. **Collez l'URI dans l'application Android** (`selfishnet://pair?host=192.168.x.x&port=8443&token=...`) puis appuyez sur **Se connecter au serveur**.
+   - Sur **Windows** : cliquez simplement sur le bouton **`Appairage Android`** en haut à droite de `MyNet-Filter-GUI.exe` (l'URI est copiée automatiquement dans le presse-papiers ; autorisez le port `8443` dans le Pare-feu Windows sur le réseau privé si demandé).
+2. **Collez l'URI dans l'application Android** (`mynetfilter://pair?host=192.168.x.x&port=8443&token=...`) puis appuyez sur **Se connecter au serveur**.
 
 Consultez [docs/ANDROID_ARCHITECTURE.md](docs/ANDROID_ARCHITECTURE.md) pour la spécification complète de l'API REST et la feuille de route du mode Root/Hotspot.
 
@@ -181,7 +181,7 @@ Consultez [docs/ANDROID_ARCHITECTURE.md](docs/ANDROID_ARCHITECTURE.md) pour la s
 ### a) Interface graphique (Linux & Windows)
 
 ```bash
-selfishnet-gui          # Linux (utilisateur normal)
+mynet-filter-gui          # Linux (utilisateur normal)
 ```
 
 - **Tableau de bord** : 4 cartes KPI, graphique d'activité réseau en temps réel, filtres (`Tous`, `Actifs`, `Restreints`, `Protégés`), recherche instantanée et tri sur toutes les colonnes.
@@ -192,7 +192,7 @@ selfishnet-gui          # Linux (utilisateur normal)
 ### b) Console interactive (Linux / SSH)
 
 ```bash
-sudo selfishnet watch
+sudo mynet-filter watch
 ```
 
 | Touche | Effet |
@@ -207,18 +207,18 @@ sudo selfishnet watch
 ### c) Ligne de commande Linux (scriptable)
 
 ```bash
-sudo selfishnet scan                       # découvrir les appareils (--json dispo)
-sudo selfishnet pause 3                    # coupe l'appareil n°3
-sudo selfishnet pause 3 --duration 600     # pause automatique de 10 minutes
-sudo selfishnet pause 2,4                  # plusieurs appareils d'un coup
-sudo selfishnet pause local                # coupe tous les appareils non protégés
-sudo selfishnet limit 3 --rate 200         # 200 kb/s maxi
-sudo selfishnet free 3                     # rend l'appareil à la normale
-sudo selfishnet free all                   # tout le monde
-sudo selfishnet safe add 192.168.1.25      # protège un appareil en Safe Mode
-sudo selfishnet alias set 192.168.1.25 "TV Salon"
-sudo selfishnet status --json              # état courant au format JSON
-sudo selfishnet quit                       # arrête le service + restaure tout
+sudo mynet-filter scan                       # découvrir les appareils (--json dispo)
+sudo mynet-filter pause 3                    # coupe l'appareil n°3
+sudo mynet-filter pause 3 --duration 600     # pause automatique de 10 minutes
+sudo mynet-filter pause 2,4                  # plusieurs appareils d'un coup
+sudo mynet-filter pause local                # coupe tous les appareils non protégés
+sudo mynet-filter limit 3 --rate 200         # 200 kb/s maxi
+sudo mynet-filter free 3                     # rend l'appareil à la normale
+sudo mynet-filter free all                   # tout le monde
+sudo mynet-filter safe add 192.168.1.25      # protège un appareil en Safe Mode
+sudo mynet-filter alias set 192.168.1.25 "TV Salon"
+sudo mynet-filter status --json              # état courant au format JSON
+sudo mynet-filter quit                       # arrête le service + restaure tout
 ```
 
 ---
@@ -230,24 +230,24 @@ Le dépôt inclut 3 workflows automatisés dans `.github/workflows/` :
 | Workflow | Fichier | Déclenchement | Artefact produit |
 |---|---|---|---|
 | **CI** | `ci.yml` | Chaque `push` et `pull_request` | Lint `ruff` + `pytest` sur Linux (Python 3.10 & 3.12) et Windows (Python 3.12) |
-| **Build Windows release** | `build-windows.yml` | Manuel (`workflow_dispatch`), tags `v*`, ou push sur fichiers Windows/core/UI | `selfishnet-windows-release` (`SelfishNet-Windows-<date>.zip` + `SHA256SUMS.txt`) |
-| **Build Android APK** | `build-android.yml` | Manuel (`workflow_dispatch`), tags `v*`, ou push sur `android/**` | `selfishnet-android-apk` (`SelfishNet-Companion-<date>.apk` + `SHA256SUMS.txt`) |
+| **Build Windows release** | `build-windows.yml` | Manuel (`workflow_dispatch`), tags `v*`, ou push sur fichiers Windows/core/UI | `mynet-filter-windows-release` (`MyNet-Filter-Windows-<date>.zip` + `SHA256SUMS.txt`) |
+| **Build Android APK** | `build-android.yml` | Manuel (`workflow_dispatch`), tags `v*`, ou push sur `android/**` | `mynet-filter-android-apk` (`MyNet-Filter-Android-<date>.apk` + `SHA256SUMS.txt`) |
 
 Pour créer une release Linux localement :
 
 ```bash
 bash build-release.sh
-# Produit dist/release/SelfishNet-Linux-<date>.tar.gz (démon + GUI) + SHA256SUMS.txt
+# Produit dist/release/MyNet Filter-<date>.tar.gz (démon + GUI) + SHA256SUMS.txt
 ```
 
 ---
 
 ## 6. Sécurité, réversibilité & limites honnêtes
 
-- **Sécurité IPC** : le socket `/run/selfishnet.sock` est restreint au groupe `selfishnet` (`0660`), toutes les commandes système s'exécutent sans shell (`shell=False`) avec validation stricte IPv4/MAC/interface.
-- **Sortie propre** : à `q`, `Ctrl-C`, `quit` ou `systemctl stop`, les tables ARP sont restaurées, les règles `iptables`/`ip6tables`/`tc` (ou Pare-feu Windows) sont supprimées et `net.ipv4.ip_forward` est remis à son état initial. Filet de sécurité Linux : `sudo selfishnet clean`.
+- **Sécurité IPC** : le socket `/run/mynet-filter.sock` est restreint au groupe `mynet-filter` (`0660`), toutes les commandes système s'exécutent sans shell (`shell=False`) avec validation stricte IPv4/MAC/interface.
+- **Sortie propre** : à `q`, `Ctrl-C`, `quit` ou `systemctl stop`, les tables ARP sont restaurées, les règles `iptables`/`ip6tables`/`tc` (ou Pare-feu Windows) sont supprimées et `net.ipv4.ip_forward` est remis à son état initial. Filet de sécurité Linux : `sudo mynet-filter clean`.
 - **Désinstallation Linux** : `bash uninstall.sh`.
-- **IPv6 & AP Isolation** : `sudo selfishnet doctor` signale si IPv6 est actif sur le Wi-Fi. Si la box active l'isolation des clients Wi-Fi (AP Isolation), vérifiez avec `sudo selfishnet selftest <IP>`.
+- **IPv6 & AP Isolation** : `sudo mynet-filter doctor` signale si IPv6 est actif sur le Wi-Fi. Si la box active l'isolation des clients Wi-Fi (AP Isolation), vérifiez avec `sudo mynet-filter selftest <IP>`.
 - **Usage responsable** : n'utilisez cet outil que sur **votre propre réseau** et sur des appareils dont vous êtes responsable.
 
 ---
@@ -256,16 +256,16 @@ bash build-release.sh
 
 | Fichier / Dossier | Rôle |
 |---|---|
-| `selfishnet_core.py` | Noyau partagé (validation stricte, OUI, alias, minuteurs, TokenBucket, IPC, API Companion Android) |
-| `selfishnet_ui_common.py` | Composants UX partagés (thème sombre, cartes KPI, graphique temps réel, filtres, tri, export CSV/JSON) |
-| `selfishnet.py` | Moteur Linux, démon IPC, CLI & TUI console |
-| `selfishnet_tui.py` | Interface graphique Tkinter Linux |
-| `selfishnet_windows.py` | Backend natif Windows (Npcap, relais L2 TokenBucket, Pare-feu PowerShell multi-langues) |
-| `selfishnet_windows_tui.py` | Interface graphique Tkinter Windows |
+| `mynet_filter_core.py` | Noyau partagé (validation stricte, OUI, alias, minuteurs, TokenBucket, IPC, API Companion Android) |
+| `mynet_filter_ui_common.py` | Composants UX partagés (thème sombre, cartes KPI, graphique temps réel, filtres, tri, export CSV/JSON) |
+| `mynet_filter.py` | Moteur Linux, démon IPC, CLI & TUI console |
+| `mynet_filter_gui.py` | Interface graphique Tkinter Linux |
+| `mynet_filter_windows.py` | Backend natif Windows (Npcap, relais L2 TokenBucket, Pare-feu PowerShell multi-langues) |
+| `mynet_filter_windows_gui.py` | Interface graphique Tkinter Windows |
 | `android/` | Projet Android Studio complet (Kotlin + Jetpack Compose Material 3) |
 | `assets/` | Icônes (`svg`, `png`, `ico`) et base OUI hors-ligne (`oui.txt`) |
 | `docs/ANDROID_ARCHITECTURE.md` | Spécification technique & contrat API Android |
 | `install.sh` / `uninstall.sh` | Installation et désinstallation Linux |
-| `selfishnet.service` | Unité systemd sécurisée |
+| `mynet-filter.service` | Unité systemd sécurisée |
 | `build-release.sh` / `build-windows.ps1` | Scripts de packaging Linux et Windows |
 | `tests/` | Suite de tests automatisés `pytest` (31 tests) |

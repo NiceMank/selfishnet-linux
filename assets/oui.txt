@@ -1,4 +1,4 @@
-# Curated offline OUI database for SelfishNet (Linux & Windows)
+# Curated offline OUI database for MyNet Filter (Linux & Windows)
 # Format: <6-HEX-PREFIX> <Vendor Name>
 000393 Apple
 000502 Apple

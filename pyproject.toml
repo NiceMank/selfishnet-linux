@@ -1,5 +1,5 @@
 [project]
-name = "selfishnet-linux"
+name = "mynet-filter"
 version = "1.1.0"
 description = "Contrôleur de bande passante Wi-Fi / LAN (Linux, Windows et API Companion Android)"
 readme = "README.md"

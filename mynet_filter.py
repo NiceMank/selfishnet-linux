@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-SelfishNet-Linux — l'équivalent Linux de SelfishNet (Windows).
+MyNet Filter — l'équivalent Linux de MyNet Filter (Windows).
 
 But : reprendre le contrôle du wifi partagé quand les autres appareils saturent
 la connexion.
@@ -14,7 +14,7 @@ Fonctions :
   * Safe Mode, alias persistants, minuteurs automatiques, API distante sécurisée ;
   * restauration propre des tables ARP, d'ip_forward et de toutes les règles à l'arrêt.
 
-Usage : sudo selfishnet <commande>   (voir --help ou README.md)
+Usage : sudo mynet-filter <commande>   (voir --help ou README.md)
 
 Avertissement : ne l'utilisez que sur VOTRE réseau / des appareils dont vous
 êtes responsable (votre box, votre partage de connexion, votre famille).
@@ -40,13 +40,13 @@ import threading
 import time
 from collections import defaultdict, deque
 
-# Assurer l'import de selfishnet_core même quand le script est exécuté via lien symbolique
+# Assurer l'import de mynet_filter_core même quand le script est exécuté via lien symbolique
 _HERE = os.path.dirname(os.path.realpath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-import selfishnet_core as core
-from selfishnet_core import (
+import mynet_filter_core as core
+from mynet_filter_core import (
     VERSION,
     DeviceAliasStore,
     RemoteAPIServer,
@@ -71,11 +71,11 @@ for _p in ("/usr/sbin", "/sbin", "/usr/local/sbin"):
     if _p not in os.environ.get("PATH", "").split(":"):
         os.environ["PATH"] = os.environ.get("PATH", "") + ":" + _p
 
-STATE_DIR = "/var/lib/selfishnet"
+STATE_DIR = "/var/lib/mynet-filter"
 STATE_FILE = os.path.join(STATE_DIR, "state.json")
-SOCK_FILE = "/run/selfishnet.sock"
-IPT_CHAIN = "SELFISHNET"          # chaîne filter (DROP = pause)
-MANGLE_CHAIN = "SELFISHNET"       # chaîne mangle (MARKing pour le shaping)
+SOCK_FILE = "/run/mynet-filter.sock"
+IPT_CHAIN = "MYNETFILTER"          # chaîne filter (DROP = pause)
+MANGLE_CHAIN = "MYNETFILTER"       # chaîne mangle (MARKing pour le shaping)
 POISON_INTERVAL = 1.5             # secondes entre deux salves ARP
 RATE_WINDOW = 3.0                 # fenêtre de mesure du débit (s)
 MARK_BASE = 100                   # base pour les handles tc
@@ -90,7 +90,7 @@ _OUI_LOADED = core._OUI_LOADED
 
 
 def get_vendor(mac):
-    """Délègue à selfishnet_core tout en respectant les variables de cache exposées."""
+    """Délègue à mynet_filter_core tout en respectant les variables de cache exposées."""
     core._OUI_LOADED = _OUI_LOADED
     res = core.get_vendor(mac)
     return res
@@ -128,7 +128,7 @@ def ok(cmd):
 
 def require_root():
     if os.geteuid() != 0:
-        die("Cette commande doit être lancée en root : sudo selfishnet ...")
+        die("Cette commande doit être lancée en root : sudo mynet-filter ...")
 
 
 def die(msg, code=1):
@@ -937,7 +937,7 @@ class Enforcer:
         set_ip_forward(True)
         with self._rules_lock:
             self._ensure_chains()
-        self._thread = threading.Thread(target=self._poison_loop, daemon=True, name="SelfishNetARP")
+        self._thread = threading.Thread(target=self._poison_loop, daemon=True, name="MyNetFilterARP")
         self._thread.start()
 
     def stop(self):
@@ -1408,13 +1408,13 @@ class Daemon:
 
     # -- serveur IPC sécurisé
     def _configure_socket_permissions(self):
-        """Restreint le socket au groupe selfishnet / SUDO_GID (0o660), jamais 0o666 par défaut."""
+        """Restreint le socket au groupe mynet-filter / SUDO_GID (0o660), jamais 0o666 par défaut."""
         if self.allow_all_local:
             os.chmod(SOCK_FILE, 0o666)
             return
         gid = None
         if grp is not None:
-            for group_name in ("selfishnet", "sudo", "wheel"):
+            for group_name in ("mynet-filter", "sudo", "wheel"):
                 try:
                     gid = grp.getgrnam(group_name).gr_gid
                     break
@@ -1437,7 +1437,7 @@ class Daemon:
             allowed_users.add(sudo_user)
         if grp is not None:
             try:
-                allowed_users.update(grp.getgrnam("selfishnet").gr_mem)
+                allowed_users.update(grp.getgrnam("mynet-filter").gr_mem)
             except KeyError:
                 pass
         for username in sorted(allowed_users):
@@ -1618,7 +1618,7 @@ class Daemon:
         threading.Thread(target=self._active_probe, daemon=True).start()
         signal.signal(signal.SIGINT, lambda *_: setattr(self, "running", False))
         signal.signal(signal.SIGTERM, lambda *_: setattr(self, "running", False))
-        th = threading.Thread(target=self.serve, daemon=True, name="SelfishNetIPC")
+        th = threading.Thread(target=self.serve, daemon=True, name="MyNetFilterIPC")
         th.start()
 
         if self.api_port:
@@ -1635,7 +1635,7 @@ class Daemon:
 
         info("Découverte active du réseau en cours …")
         time.sleep(2)
-        info("Prêt. Commandes : sudo selfishnet <scan|pause|limit|free|status>")
+        info("Prêt. Commandes : sudo mynet-filter <scan|pause|limit|free|status>")
         if tui and sys.stdin.isatty():
             self.loop_tui()
         else:
@@ -1775,9 +1775,9 @@ def cmd_scan(args):
         print(render_table(rows, {}))
         print(f"\n{len(rows)} appareil(s) détecté(s).")
         print("\nExemples :")
-        print("  sudo selfishnet pause 2        # coupe l'appareil n°2")
-        print("  sudo selfishnet limit 2 --rate 300")
-        print("  sudo selfishnet free all")
+        print("  sudo mynet-filter pause 2        # coupe l'appareil n°2")
+        print("  sudo mynet-filter limit 2 --rate 300")
+        print("  sudo mynet-filter free all")
     if rows:
         save_state({"last_scan": [r["ip"] for r in rows], "iface": iface,
                     "my_ip": my_ip, "gateway": gw, "ts": time.time()})
@@ -1807,9 +1807,9 @@ def cmd_watch(args, disc=None):
 def _check_ipc_error(st):
     err = st.get("error")
     if err == "daemon_absent":
-        die("Le service n'est pas lancé. Lancez-le avec : sudo selfishnet watch (ou daemon)")
+        die("Le service n'est pas lancé. Lancez-le avec : sudo mynet-filter watch (ou daemon)")
     if err == "permission_denied":
-        die("Permission refusée sur le socket du démon : ajoutez votre utilisateur au groupe 'selfishnet' ou lancez avec sudo.")
+        die("Permission refusée sur le socket du démon : ajoutez votre utilisateur au groupe 'mynet-filter' ou lancez avec sudo.")
     if err:
         die(err)
 

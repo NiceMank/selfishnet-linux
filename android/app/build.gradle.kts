@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.selfishnet.companion"
+    namespace = "com.mynetfilter.companion"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.selfishnet.companion"
+        applicationId = "com.mynetfilter.companion"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-SelfishNet Core — composants partagés multi-plateformes (Linux, Windows, API Companion Android).
+MyNet Filter Core — composants partagés multi-plateformes (Linux, Windows, API Companion Android).
 
 Uniquement basé sur la bibliothèque standard Python :
   * validation stricte des entrées (IPv4, MAC, interface, débit, cible Safe Mode) ;
@@ -45,8 +45,8 @@ def resource_path(rel_path):
         candidates.append(os.path.join(meipass, rel_path))
     here = os.path.dirname(os.path.abspath(__file__))
     candidates.append(os.path.join(here, rel_path))
-    candidates.append(os.path.join("/usr/local/lib/selfishnet", rel_path))
-    candidates.append(os.path.join("/usr/share/selfishnet", rel_path))
+    candidates.append(os.path.join("/usr/local/lib/mynet-filter", rel_path))
+    candidates.append(os.path.join("/usr/share/mynet-filter", rel_path))
     for path in candidates:
         if os.path.exists(path):
             return path
@@ -418,7 +418,7 @@ class RemoteAPIServer:
             "name": self.device_name,
             "v": "1",
         })
-        return f"selfishnet://pair?{params}"
+        return f"mynetfilter://pair?{params}"
 
     def start(self):
         api_ref = self
@@ -510,7 +510,7 @@ class RemoteAPIServer:
 
         self._httpd = ThreadingHTTPServer((self.host, self.port), Handler)
         self.port = self._httpd.server_address[1]
-        self._thread = threading.Thread(target=self._httpd.serve_forever, daemon=True, name="SelfishNetAPI")
+        self._thread = threading.Thread(target=self._httpd.serve_forever, daemon=True, name="MyNetFilterAPI")
         self._thread.start()
         return self.port
 

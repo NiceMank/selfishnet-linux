@@ -2,10 +2,10 @@
 Name=MyNet Filter
 GenericName=Contrôleur de bande passante WiFi
 Comment=Prioriser votre connexion en limitant ou bloquant les appareils du réseau
-Exec=/usr/local/bin/selfishnet-gui
-Icon=selfishnet
+Exec=/usr/local/bin/mynet-filter-gui
+Icon=mynet-filter
 Terminal=false
 Type=Application
 Categories=Network;System;Utility;
-Keywords=mynet;mynet filter;selfishnet;wifi;network;reseau;bande passante;bandwidth;limiter;bloquer;
+Keywords=mynet;mynet filter;mynet-filter;wifi;network;reseau;bande passante;bandwidth;limiter;bloquer;
 StartupNotify=true

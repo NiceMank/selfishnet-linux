@@ -10,9 +10,9 @@ import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-import selfishnet as sn
-import selfishnet_core as core
-import selfishnet_windows as snw
+import mynet_filter as sn
+import mynet_filter_core as core
+import mynet_filter_windows as snw
 
 
 # ------------------------------------------------------------------ Validation & Security
@@ -38,7 +38,7 @@ def test_validators_reject_command_injection():
 
 
 def test_run_never_uses_shell_true():
-    with patch("selfishnet.subprocess.run") as mock_run:
+    with patch("mynet_filter.subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0, stdout="ok", stderr="")
         rc, out = sn.run("ip -4 route show default")
         assert rc == 0
@@ -61,7 +61,7 @@ def test_daemon_safe_add_rejects_injection(tmp_path):
     d.timers = core.RuleTimerManager(lambda _ip: None)
     d.enf = MagicMock()
 
-    with patch("selfishnet.arp_lookup") as mock_arp:
+    with patch("mynet_filter.arp_lookup") as mock_arp:
         resp = d.handle({"cmd": "safe_add", "target": "192.168.1.5; id > /tmp/pwned"})
         assert "error" in resp
         mock_arp.assert_not_called()
@@ -81,7 +81,7 @@ def test_bundled_oui_lookup():
     core._OUI_LOADED = False
     core._OUI_CACHE.clear()
     orig_isfile = os.path.isfile
-    with patch("selfishnet_core.os.path.isfile", side_effect=lambda p: False if str(p).startswith("/usr/share/") else orig_isfile(p)):
+    with patch("mynet_filter_core.os.path.isfile", side_effect=lambda p: False if str(p).startswith("/usr/share/") else orig_isfile(p)):
         assert core.get_vendor("00:07:cb:11:22:33") == "Freebox"
         assert core.get_vendor("b8:27:eb:aa:bb:cc") == "Raspberry Pi"
 
@@ -133,7 +133,7 @@ def test_remote_api_server_auth_and_routes():
     port = api.start()
     try:
         base = f"http://127.0.0.1:{port}"
-        assert "selfishnet://pair?" in api.pairing_uri("192.168.1.10")
+        assert "mynetfilter://pair?" in api.pairing_uri("192.168.1.10")
 
         # Public health check
         with urllib.request.urlopen(f"{base}/api/v1/health", timeout=5) as resp:
@@ -182,7 +182,7 @@ def test_discovery_subnet_broadcast_and_no_subprocess_in_snapshot():
     assert disc._is_local_host("8.8.8.8") is False
 
     disc.devices["192.168.0.50"] = {"mac": None, "first": time.time(), "last": time.time(), "pkts": 1, "bytes": 100}
-    with patch("selfishnet.read_proc_arp", return_value={}), patch("selfishnet.run") as mock_run:
+    with patch("mynet_filter.read_proc_arp", return_value={}), patch("mynet_filter.run") as mock_run:
         rows = disc.snapshot()
         mock_run.assert_not_called()
         # Internal device MAC stays None (not corrupted with '?'), while display shows '?'
@@ -208,8 +208,8 @@ def test_enforcer_rejects_question_mark_mac_and_fallback_xt_mac(monkeypatch):
             return MagicMock(returncode=2, stderr="Couldn't load match mac")
         return MagicMock(returncode=0, stdout="", stderr="")
 
-    with patch("selfishnet.iptables_available", return_value=True), \
-         patch("selfishnet.subprocess.run", side_effect=fake_restore):
+    with patch("mynet_filter.iptables_available", return_value=True), \
+         patch("mynet_filter.subprocess.run", side_effect=fake_restore):
         enf._apply_drop(dict(enf.targets))
     assert sn.MAC_MATCH is False
     assert any("règle MAC non supportée" in e for e in enf.errors)
@@ -229,8 +229,8 @@ def test_parser_safe_and_alias_without_subcommand():
 
 # ------------------------------------------------------------------ Windows Backend Fixes
 def test_windows_clear_rules_locale_independent():
-    with patch("selfishnet_windows.run_powershell", return_value=(0, "4")) as mock_ps:
-        rc, msg = snw.clear_selfishnet_rules()
+    with patch("mynet_filter_windows.run_powershell", return_value=(0, "4")) as mock_ps:
+        rc, msg = snw.clear_mynet_filter_rules()
         assert rc == 0
         assert "4 règle(s)" in msg
         mock_ps.assert_called_once()
@@ -276,7 +276,7 @@ def test_windows_poison_packet_uses_my_mac_as_eth_src_and_resolves_unknown_mac(t
 
     # Verify set_pause resolves MAC when stored MAC is '?'
     with patch.object(net, "resolve_mac", return_value="11:22:33:44:55:66") as mock_res, \
-         patch("selfishnet_windows.pause_ip", return_value=True):
+         patch("mynet_filter_windows.pause_ip", return_value=True):
         net.set_pause("192.168.1.50")
         mock_res.assert_called_once_with("192.168.1.50")
         assert net.targets["192.168.1.50"]["mac"] == "11:22:33:44:55:66"

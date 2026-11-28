@@ -1,6 +1,6 @@
-# SelfishNet Companion (Android)
+# MyNet Filter Companion (Android)
 
-Application Android compagnon (Kotlin + Jetpack Compose + Material 3) permettant de piloter à distance un serveur SelfishNet (Linux, Windows ou Raspberry Pi) sur votre réseau local, **sans root**.
+Application Android compagnon (Kotlin + Jetpack Compose + Material 3) permettant de piloter à distance un serveur MyNet Filter (Linux, Windows ou Raspberry Pi) sur votre réseau local, **sans root**.
 
 ## Ouvrir & Compiler
 
@@ -12,10 +12,10 @@ Application Android compagnon (Kotlin + Jetpack Compose + Material 3) permettant
 
 Sur Linux :
 ```bash
-sudo selfishnet daemon --api-bind 0.0.0.0 --api-port 8443
+sudo mynet-filter daemon --api-bind 0.0.0.0 --api-port 8443
 ```
 
 Sur Windows :
-- Cliquez sur le bouton **Appairage Android** dans la fenêtre SelfishNet Windows.
+- Cliquez sur le bouton **Appairage Android** dans la fenêtre MyNet Filter Windows.
 
-Copiez l'URI `selfishnet://pair?host=...&port=8443&token=...` affichée par le serveur et collez-la dans l'écran d'appairage de l'application Android (ou ouvrez-la directement par lien/QR code).
+Copiez l'URI `mynetfilter://pair?host=...&port=8443&token=...` affichée par le serveur et collez-la dans l'écran d'appairage de l'application Android (ou ouvrez-la directement par lien/QR code).

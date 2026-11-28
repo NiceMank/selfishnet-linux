@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-SelfishNet — Backend natif Windows (v1.1.0).
+MyNet Filter — Backend natif Windows (v1.1.0).
 
 Fonctionnalités :
   * découverte passive + balayage ARP actif strictement filtré sur le sous-réseau local ;
@@ -27,8 +27,8 @@ _HERE = os.path.dirname(os.path.realpath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-import selfishnet_core as core
-from selfishnet_core import (
+import mynet_filter_core as core
+from mynet_filter_core import (
     VERSION,
     DeviceAliasStore,
     RemoteAPIServer,
@@ -51,7 +51,7 @@ _RULES_LOCK = threading.Lock()
 
 def _state_dir():
     base = os.environ.get("PROGRAMDATA") or os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
-    return os.path.join(base, "SelfishNet")
+    return os.path.join(base, "MyNet Filter")
 
 
 def is_user_admin():
@@ -114,7 +114,7 @@ def run_powershell(script, timeout=15):
 
 def firewall_rule_name(ip, direction):
     clean = str(ip).replace(".", "_").replace(":", "_")
-    return f"SelfishNet-{direction}-{clean}"
+    return f"MyNetFilter-{direction}-{clean}"
 
 
 def pause_ip(ip):
@@ -152,15 +152,15 @@ def free_ip(ip):
 
 
 def free_all():
-    return clear_selfishnet_rules()
+    return clear_mynet_filter_rules()
 
 
-def clear_selfishnet_rules():
-    """Supprime toutes les règles créées par SelfishNet (100% indépendant de la langue Windows)."""
+def clear_mynet_filter_rules():
+    """Supprime toutes les règles créées par MyNet Filter (100% indépendant de la langue Windows)."""
     removed = 0
     # 1) Suppression PowerShell locale-indépendante (fonctionne sur Windows FR, EN, DE, ES, etc.)
     rc, out = run_powershell(
-        "$r = Get-NetFirewallRule -DisplayName 'SelfishNet-*' -ErrorAction SilentlyContinue; "
+        "$r = Get-NetFirewallRule -DisplayName 'MyNetFilter-*' -ErrorAction SilentlyContinue; "
         "if ($r) { $c = @($r).Count; $r | Remove-NetFirewallRule -ErrorAction SilentlyContinue; Write-Output $c } "
         "else { Write-Output 0 }"
     )
@@ -473,12 +473,12 @@ class WindowsNetwork:
         self.initialized = True
         self.poison_thread = threading.Thread(
             target=self._poison_loop,
-            name="SelfishNetARP",
+            name="MyNetFilterARP",
             daemon=True,
         )
         self.poison_thread.start()
         atexit.register(self.stop)
-        threading.Thread(target=self.rescan, daemon=True, name="SelfishNetScan").start()
+        threading.Thread(target=self.rescan, daemon=True, name="MyNetFilterScan").start()
         return True
 
     def _maybe_relay_limited_packet(self, pkt, src, dst, eth_src, size):
@@ -738,7 +738,7 @@ class WindowsNetwork:
             mac = normalize_mac(cfg.get("mac"))
             if mac:
                 self.restore_arp(ip, mac)
-        clear_selfishnet_rules()
+        clear_mynet_filter_rules()
 
     def summary(self):
         timers = self.timers.snapshot()

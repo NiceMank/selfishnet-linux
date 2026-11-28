@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SelfishNetCompanion"
+rootProject.name = "MyNetFilter"
 include(":app")
