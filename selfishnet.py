@@ -1430,6 +1430,20 @@ class Daemon:
         else:
             os.chmod(SOCK_FILE, 0o600)
 
+        # ACL par UID (setfacl) : permet l'accès immédiat après install.sh sans déconnexion/reconnexion
+        allowed_users = set()
+        sudo_user = os.environ.get("SUDO_USER")
+        if sudo_user and sudo_user != "root":
+            allowed_users.add(sudo_user)
+        if grp is not None:
+            try:
+                allowed_users.update(grp.getgrnam("selfishnet").gr_mem)
+            except KeyError:
+                pass
+        for username in sorted(allowed_users):
+            if re.fullmatch(r"[a-zA-Z0-9_.-]{1,32}", username):
+                run(["setfacl", "-m", f"u:{username}:rw", SOCK_FILE])
+
     def _peer_allowed(self, conn):
         """Vérifie les identifiants du processus client via SO_PEERCRED."""
         if self.allow_all_local:

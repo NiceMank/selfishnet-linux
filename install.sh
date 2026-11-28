@@ -45,6 +45,9 @@ if ! getent group selfishnet >/dev/null 2>&1; then
 fi
 if [ -n "$TARGET_USER" ] && [ "$TARGET_USER" != "root" ]; then
   sudo usermod -aG selfishnet "$TARGET_USER" 2>/dev/null || true
+  if [ -S /run/selfishnet.sock ] && command -v setfacl >/dev/null 2>&1; then
+    sudo setfacl -m "u:${TARGET_USER}:rw" /run/selfishnet.sock 2>/dev/null || true
+  fi
 fi
 sudo sysctl -w net.ipv4.ip_forward=1 >/dev/null
 echo 'net.ipv4.ip_forward=1' | sudo tee /etc/sysctl.d/99-selfishnet.conf >/dev/null

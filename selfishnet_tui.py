@@ -136,6 +136,8 @@ class App:
 
         self.btn_daemon = ttk.Button(head, text="Démarrer le service", command=self.toggle_daemon)
         self.btn_daemon.pack(side="right", padx=(8, 0))
+        self.btn_fix_perms = ttk.Button(head, text="Corriger permissions", style="Warn.TButton",
+                                        command=self.fix_socket_permissions)
         ttk.Button(head, text="Exporter", command=self.export_data).pack(side="right", padx=(8, 0))
         self.btn_rescan = ttk.Button(head, text="Rafraîchir (F5)", style="Ok.TButton", command=self.rescan)
         self.btn_rescan.pack(side="right", padx=(8, 0))
@@ -542,13 +544,16 @@ class App:
         err = st.get("error")
         if err == "daemon_absent":
             self.daemon_running = False
+            self.btn_fix_perms.pack_forget()
             self.btn_daemon.configure(text="Démarrer le service")
             self.lbl_net.configure(text="Service arrêté — cliquez sur « Démarrer le service »", fg=THEME["red"])
             return
         if err == "permission_denied":
             self.daemon_running = True
+            if not self.btn_fix_perms.winfo_ismapped():
+                self.btn_fix_perms.pack(side="right", padx=(8, 0))
             self.lbl_net.configure(
-                text="Accès refusé au socket (/run/selfishnet.sock) — ajoutez votre utilisateur au groupe 'selfishnet'",
+                text="Accès refusé au socket (/run/selfishnet.sock) — cliquez sur « Corriger permissions »",
                 fg=THEME["red"],
             )
             return
@@ -556,6 +561,7 @@ class App:
             self.lbl_net.configure(text=f"Erreur : {err}", fg=THEME["red"])
             return
 
+        self.btn_fix_perms.pack_forget()
         self.daemon_running = True
         self.btn_daemon.configure(text="Arrêter le service")
         self.devices = st.get("devices", [])
@@ -642,6 +648,29 @@ class App:
         for child in list(self.tree.get_children()):
             if child not in current_iids:
                 self.tree.delete(child)
+
+    def fix_socket_permissions(self):
+        import getpass
+        user = getpass.getuser()
+        if not shutil.which("pkexec"):
+            self.say(f"Exécutez en terminal : sudo usermod -aG selfishnet {user} && sudo setfacl -m u:{user}:rw {SOCK_FILE}")
+            return
+
+        def job():
+            script = (
+                f"groupadd -rf selfishnet && "
+                f"usermod -aG selfishnet {user} && "
+                f"(setfacl -m u:{user}:rw {SOCK_FILE} 2>/dev/null || chgrp selfishnet {SOCK_FILE})"
+            )
+            p = subprocess.run(["pkexec", "sh", "-c", script], capture_output=True, text=True, check=False)
+            if p.returncode != 0:
+                return {"error": (p.stderr or p.stdout or "Authentification annulée").strip()}
+            return {"message": f"Permissions corrigées pour {user}."}
+
+        self._run_async(job, lambda res: (
+            self._report_ipc_result("Permissions", res),
+            self.root.after(400, self.refresh_async),
+        ))
 
     def toggle_daemon(self):
         if self.daemon_running:
