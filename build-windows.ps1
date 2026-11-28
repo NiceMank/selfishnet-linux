@@ -11,7 +11,7 @@ if (Test-Path "assets/selfishnet.ico") {
 }
 
 pyinstaller --clean --noconfirm `
-    --name SelfishNet-GUI `
+    --name MyNet-Filter-GUI `
     --onefile --windowed `
     --uac-admin `
     @iconArgs `
@@ -21,8 +21,8 @@ pyinstaller --clean --noconfirm `
 
 $date = Get-Date -Format "yyyyMMdd"
 New-Item -ItemType Directory -Force -Path dist/release | Out-Null
-$zipPath = "dist/release/SelfishNet-Windows-$date.zip"
-Compress-Archive -Force -Path dist/SelfishNet-GUI.exe -DestinationPath $zipPath
+$zipPath = "dist/release/MyNet-Filter-Windows-$date.zip"
+Compress-Archive -Force -Path dist/MyNet-Filter-GUI.exe -DestinationPath $zipPath
 $hash = (Get-FileHash -Algorithm SHA256 $zipPath).Hash.ToLower()
 "$hash  $(Split-Path -Leaf $zipPath)" | Out-File -Encoding ascii "dist/release/SHA256SUMS.txt"
 Write-Host "Release Windows prête : $zipPath ($hash)"

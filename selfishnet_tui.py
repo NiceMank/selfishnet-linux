@@ -87,7 +87,7 @@ class App:
         self._refreshing = False
         self._shown_errors = []
 
-        root.title(f"SelfishNet Linux v{VERSION} — Contrôle de la bande passante")
+        root.title(f"MyNet Filter Linux v{VERSION} — Contrôle de la bande passante")
         root.configure(bg=THEME["bg"])
         root.geometry("1240x800")
         root.minsize(1020, 640)
@@ -129,7 +129,7 @@ class App:
         # 1) En-tête
         head = tk.Frame(self.root, bg=THEME["bg"])
         head.pack(fill="x", padx=18, pady=(14, 4))
-        tk.Label(head, text="SelfishNet", font=("TkDefaultFont", 17, "bold"),
+        tk.Label(head, text="MyNet Filter", font=("TkDefaultFont", 17, "bold"),
                  bg=THEME["bg"], fg=THEME["fg"]).pack(side="left")
         tk.Label(head, text=f"  Linux v{VERSION}", font=("TkDefaultFont", 10),
                  bg=THEME["bg"], fg=THEME["muted"]).pack(side="left", pady=(4, 0))

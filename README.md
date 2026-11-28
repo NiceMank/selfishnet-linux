@@ -1,7 +1,7 @@
-# SelfishNet — Contrôleur de bande passante Wi-Fi / LAN (Linux, Windows & Android)
+# MyNet Filter — Contrôleur de bande passante Wi-Fi / LAN (Linux, Windows & Android)
 
 Quand les autres appareils du réseau saturent la connexion et que vos appels,
-uploads ou agents IA ralentissent, SelfishNet vous redonne la priorité : il
+uploads ou agents IA ralentissent, **MyNet Filter** vous redonne la priorité : il
 **met en pause** ou **plafonne le débit** des appareils de votre choix, avec un
 tableau de bord temps réel (cartes KPI, graphique de débit, Mode Focus, Safe Mode,
 alias, minuteurs et export CSV/JSON).

@@ -1,5 +1,5 @@
 [Unit]
-Description=SelfishNet-Linux — contrôle de la bande passante du réseau partagé
+Description=MyNet Filter — contrôle de la bande passante du réseau partagé
 Documentation=file:/usr/local/lib/selfishnet/selfishnet.py
 After=network-online.target
 Wants=network-online.target

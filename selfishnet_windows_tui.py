@@ -55,7 +55,7 @@ class App:
         self._ready = False
         self._shown_errors = []
 
-        root.title(f"SelfishNet Windows v{VERSION} — Contrôle de la bande passante")
+        root.title(f"MyNet Filter Windows v{VERSION} — Contrôle de la bande passante")
         root.configure(bg=THEME["bg"])
         root.geometry("1240x800")
         root.minsize(1020, 640)
@@ -100,7 +100,7 @@ class App:
     def _build(self):
         head = tk.Frame(self.root, bg=THEME["bg"])
         head.pack(fill="x", padx=18, pady=(14, 4))
-        tk.Label(head, text="SelfishNet", font=("TkDefaultFont", 17, "bold"),
+        tk.Label(head, text="MyNet Filter", font=("TkDefaultFont", 17, "bold"),
                  bg=THEME["bg"], fg=THEME["fg"]).pack(side="left")
         tk.Label(head, text=f"  Windows v{VERSION}", font=("TkDefaultFont", 10),
                  bg=THEME["bg"], fg=THEME["muted"]).pack(side="left", pady=(4, 0))
@@ -307,7 +307,7 @@ class App:
                 "Appairage Android Companion",
                 "L'API Companion est maintenant active sur le port 8443.\n\n"
                 f"URI d'appairage (copiée dans le presse-papiers) :\n{uri}\n\n"
-                "Collez cette URI dans l'application Android SelfishNet Companion.",
+                "Collez cette URI dans l'application Android MyNet Filter.",
             )
         except Exception as exc:
             messagebox.showerror("Appairage Android", str(exc))
@@ -489,7 +489,7 @@ class App:
                     self._ready = False
                     self.lbl_net.configure(text=f"Erreur : {msg}", fg=THEME["red"])
                     self.say(f"[Erreur] {msg}")
-                    messagebox.showerror("SelfishNet Windows", msg)
+                    messagebox.showerror("MyNet Filter Windows", msg)
                 elif kind in ("log", "error_toast"):
                     self.say(msg)
         except queue.Empty:

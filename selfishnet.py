@@ -1159,7 +1159,7 @@ def selftest(args):
 def doctor(args):
     require_root()
     iface = args.iface or default_iface()
-    print(f"\nDiagnostic SelfishNet-Linux {VERSION}")
+    print(f"\nDiagnostic MyNet Filter {VERSION}")
     print("=" * 42)
     checks = []
     my_ip, mask = iface_ip(iface) if iface else (None, None)
@@ -1627,7 +1627,7 @@ class Daemon:
                 host=self.api_bind,
                 port=self.api_port,
                 token=self.api_token,
-                device_name=f"SelfishNet-{socket.gethostname()}",
+                device_name=f"MyNet Filter-{socket.gethostname()}",
             )
             bound_port = self.api_server.start()
             good(f"API distante active sur http://{self.api_bind}:{bound_port}")
@@ -1702,7 +1702,7 @@ class Daemon:
         if os.environ.get("TERM") != "dumb":
             sys.stdout.write("\033[2J\033[H")
             sys.stdout.flush()
-        print(f"\033[1mSelfishNet-Linux {VERSION}\033[0m  —  {self.iface} "
+        print(f"\033[1mMyNet Filter {VERSION}\033[0m  —  {self.iface} "
               f"({self.my_ip})  —  box {self.gw_ip}  —  trafic total "
               f"{self.disc.total_kbit():.0f} kb/s\n")
         print(render_table(rows[:25], st))
@@ -1954,22 +1954,22 @@ def cmd_clean(args):
 
 def build_parser():
     p = argparse.ArgumentParser(
-        prog="selfishnet",
-        description="SelfishNet pour Linux : reprendre le contrôle du wifi partagé "
+        prog="mynet-filter",
+        description="MyNet Filter : reprendre le contrôle du wifi partagé "
                     "(pause / limit / free des autres appareils).",
         epilog="Exemples :\n"
-               "  sudo selfishnet doctor\n"
-               "  sudo selfishnet scan\n"
-               "  sudo selfishnet watch\n"
-               "  sudo selfishnet pause 2 --duration 600\n"
-               "  sudo selfishnet limit 2 --rate 300\n"
-               "  sudo selfishnet free all\n"
-               "  sudo selfishnet alias set 192.168.1.23 'TV Salon'\n"
-               "  sudo selfishnet quit\n",
+               "  sudo mynet-filter doctor\n"
+               "  sudo mynet-filter scan\n"
+               "  sudo mynet-filter watch\n"
+               "  sudo mynet-filter pause 2 --duration 600\n"
+               "  sudo mynet-filter limit 2 --rate 300\n"
+               "  sudo mynet-filter free all\n"
+               "  sudo mynet-filter alias set 192.168.1.23 'TV Salon'\n"
+               "  sudo mynet-filter quit\n",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--iface", help="interface réseau (défaut : route par défaut)")
-    p.add_argument("-V", "--version", action="version", version=f"SelfishNet-Linux {VERSION}")
+    p.add_argument("-V", "--version", action="version", version=f"MyNet Filter {VERSION}")
     sub = p.add_subparsers(dest="cmd")
 
     s = sub.add_parser("scan", help="découvrir les appareils du réseau")

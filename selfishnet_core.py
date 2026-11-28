@@ -26,6 +26,7 @@ import time
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+APP_NAME = "MyNet Filter"
 VERSION = "1.1.0"
 
 _MAC_RE = re.compile(r"^([0-9a-f]{2}:){5}[0-9a-f]{2}$")
@@ -399,7 +400,7 @@ def ipc_request(sock_file, payload, timeout=15):
 class RemoteAPIServer:
     """Serveur HTTP JSON léger et authentifié (Bearer token) pour pilotage distant / App Android Companion."""
 
-    def __init__(self, handler_fn, host="127.0.0.1", port=8443, token=None, device_name="SelfishNet"):
+    def __init__(self, handler_fn, host="127.0.0.1", port=8443, token=None, device_name=APP_NAME):
         self.handler_fn = handler_fn
         self.host = host
         self.port = int(port)

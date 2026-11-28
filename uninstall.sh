@@ -11,8 +11,8 @@ if [ -x /usr/local/bin/selfishnet ]; then
 fi
 
 echo "==> Suppression des fichiers"
-sudo rm -f /usr/local/sbin/selfishnet /usr/local/sbin/selfishnet-gui
-sudo rm -f /usr/local/bin/selfishnet /usr/local/bin/selfishnet-gui
+sudo rm -f /usr/local/sbin/selfishnet /usr/local/sbin/selfishnet-gui /usr/local/sbin/mynet-filter /usr/local/sbin/mynet-filter-gui
+sudo rm -f /usr/local/bin/selfishnet /usr/local/bin/selfishnet-gui /usr/local/bin/mynet-filter /usr/local/bin/mynet-filter-gui
 sudo rm -rf /usr/local/lib/selfishnet
 sudo rm -f /run/selfishnet.sock
 sudo rm -f /usr/share/applications/selfishnet.desktop

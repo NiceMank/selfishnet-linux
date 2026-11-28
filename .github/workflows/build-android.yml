@@ -51,7 +51,7 @@ jobs:
           mkdir -p dist/android
           DATE="$(date +%Y%m%d)"
           APK_SRC="android/app/build/outputs/apk/debug/app-debug.apk"
-          APK_OUT="dist/android/SelfishNet-Companion-${DATE}.apk"
+          APK_OUT="dist/android/MyNet-Filter-Android-${DATE}.apk"
           cp "$APK_SRC" "$APK_OUT"
           (cd dist/android && sha256sum "$(basename "$APK_OUT")" > SHA256SUMS-Android.txt)
           ls -lh dist/android/

@@ -21,13 +21,13 @@ pyinstaller --clean --noconfirm \
     selfishnet.py
 
 pyinstaller --clean --noconfirm \
-    --name SelfishNet-GUI \
+    --name MyNet-Filter-GUI \
     --onefile --windowed \
     --add-data "assets:assets" \
     selfishnet_tui.py
 
 mkdir -p dist/release
-ARCHIVE="dist/release/SelfishNet-Linux-$(date +%Y%m%d).tar.gz"
-tar -C dist -czf "$ARCHIVE" selfishnet SelfishNet-GUI
+ARCHIVE="dist/release/MyNet-Filter-Linux-$(date +%Y%m%d).tar.gz"
+tar -C dist -czf "$ARCHIVE" selfishnet MyNet-Filter-GUI
 (cd dist/release && sha256sum "$(basename "$ARCHIVE")" > SHA256SUMS.txt)
 echo "Release prête : $ARCHIVE"

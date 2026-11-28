@@ -68,10 +68,10 @@ private fun PairingScreen(initialUri: String, onPaired: (PairingConfig) -> Unit)
             .padding(24.dp),
         verticalArrangement = Arrangement.Center,
     ) {
-        Text("SelfishNet Companion", fontSize = 26.sp, fontWeight = FontWeight.Bold)
+        Text("MyNet Filter", fontSize = 26.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(6.dp))
         Text(
-            "Connectez ce téléphone à votre PC Linux ou Windows lançant SelfishNet (--api-port 8443).",
+            "Connectez ce téléphone à votre PC Linux ou Windows lançant MyNet Filter (--api-port 8443).",
             color = MutedText,
             fontSize = 14.sp,
         )
@@ -141,7 +141,7 @@ private fun DashboardScreen(config: PairingConfig, onDisconnect: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
-                Text("SelfishNet", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text("MyNet Filter", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Text(statusBanner, fontSize = 12.sp, color = MutedText)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

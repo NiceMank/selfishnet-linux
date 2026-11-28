@@ -6,7 +6,7 @@
 
     <application
         android:allowBackup="false"
-        android:label="SelfishNet Companion"
+        android:label="MyNet Filter"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@android:style/Theme.Material.NoActionBar">

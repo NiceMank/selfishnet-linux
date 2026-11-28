@@ -348,11 +348,11 @@ class WindowsNetwork:
 
     def initialize(self):
         if not is_user_admin():
-            raise PermissionError("SelfishNet Windows doit être exécuté en tant qu'administrateur.")
+            raise PermissionError("MyNet Filter Windows doit être exécuté en tant qu'administrateur.")
         if os.name == "nt" and not check_npcap_installed():
             raise RuntimeError(
                 "Npcap n'est pas installé. Téléchargez et installez Npcap (https://npcap.com/#download) "
-                "en activant le mode compatible WinPcap, puis relancez SelfishNet."
+                "en activant le mode compatible WinPcap, puis relancez MyNet Filter."
             )
 
         try:
@@ -837,7 +837,7 @@ class WindowsNetwork:
             host=host,
             port=port,
             token=token,
-            device_name="SelfishNet-Windows",
+            device_name="MyNet Filter-Windows",
         )
         self.api_server.start()
         return self.api_server.pairing_uri(self.my_ip)

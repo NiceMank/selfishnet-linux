@@ -6,7 +6,7 @@ data class PairingConfig(
     val host: String,
     val port: Int = 8443,
     val token: String,
-    val name: String = "SelfishNet",
+    val name: String = "MyNet Filter",
 ) {
     val baseUrl: String get() = "http://$host:$port"
 
@@ -17,7 +17,7 @@ data class PairingConfig(
             val host = uri.getQueryParameter("host")?.takeIf { it.isNotBlank() } ?: return null
             val token = uri.getQueryParameter("token")?.takeIf { it.isNotBlank() } ?: return null
             val port = uri.getQueryParameter("port")?.toIntOrNull() ?: 8443
-            val name = uri.getQueryParameter("name") ?: "SelfishNet"
+            val name = uri.getQueryParameter("name") ?: "MyNet Filter"
             return PairingConfig(host = host, port = port, token = token, name = name)
         }
     }

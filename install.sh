@@ -64,8 +64,12 @@ sudo install -m 0755 "$HERE/selfishnet_tui.py" "$LIB_DIR/selfishnet_tui.py"
 
 sudo ln -sf "$LIB_DIR/selfishnet.py" /usr/local/bin/selfishnet
 sudo ln -sf "$LIB_DIR/selfishnet_tui.py" /usr/local/bin/selfishnet-gui
+sudo ln -sf "$LIB_DIR/selfishnet.py" /usr/local/bin/mynet-filter
+sudo ln -sf "$LIB_DIR/selfishnet_tui.py" /usr/local/bin/mynet-filter-gui
 sudo ln -sf /usr/local/bin/selfishnet /usr/local/sbin/selfishnet
 sudo ln -sf /usr/local/bin/selfishnet-gui /usr/local/sbin/selfishnet-gui
+sudo ln -sf /usr/local/bin/mynet-filter /usr/local/sbin/mynet-filter
+sudo ln -sf /usr/local/bin/mynet-filter-gui /usr/local/sbin/mynet-filter-gui
 
 # Icônes et entrée de menu d'application (.desktop)
 sudo mkdir -p /usr/share/icons/hicolor/scalable/apps /usr/share/icons/hicolor/256x256/apps /usr/share/applications
